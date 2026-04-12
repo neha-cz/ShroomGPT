@@ -1,0 +1,15 @@
+.root {
+  border-radius: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  /* No backdrop-filter — avoids scroll jank with fixed full-viewport media */
+  background: linear-gradient(
+    145deg,
+    rgba(8, 6, 18, 0.78) 0%,
+    rgba(4, 4, 12, 0.82) 100%
+  );
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  box-shadow:
+    inset 0 0 0 1px rgba(34, 211, 238, 0.08),
+    0 0 24px rgba(34, 211, 238, 0.12),
+    0 0 48px rgba(232, 121, 249, 0.08);
+}

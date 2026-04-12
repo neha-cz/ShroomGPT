@@ -1,0 +1,63 @@
+:root {
+  --void: #030308;
+  --cosmic: #06060f;
+  --neon-cyan: #22d3ee;
+  --neon-magenta: #e879f9;
+  --amber-gold: #fbbf24;
+  --violet: #a78bfa;
+  --bio-green: #4ade80;
+  --text: #f4f4f8;
+  --muted: rgba(244, 244, 248, 0.72);
+  --glow-cyan: 0 0 18px rgba(34, 211, 238, 0.45), 0 0 42px rgba(34, 211, 238, 0.2);
+  --glow-magenta: 0 0 18px rgba(232, 121, 249, 0.45), 0 0 42px rgba(232, 121, 249, 0.2);
+  --font-display: "Syne", "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--void);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}

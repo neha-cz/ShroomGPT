@@ -1,0 +1,157 @@
+.section {
+  position: relative;
+  padding-top: clamp(0.25rem, 1vh, 0.5rem);
+  padding-bottom: clamp(1.75rem, 4vh, 2.75rem);
+  background: transparent;
+  border-top: 1px solid rgba(167, 139, 250, 0.1);
+}
+
+.scrollStage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+  /* Pad height shared with .copy margin so title sits flush under the filmstrip */
+  --runway-pad: clamp(5vh, 10vh, 120px);
+}
+
+/* Ref target for scrub math: sticky + pad only (copy is outside this box) */
+.runwayScrub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.stickyInner {
+  position: sticky;
+  top: clamp(2.25rem, 7vh, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+  /* No tall min-height + centering — that left a huge empty band under the filmstrip */
+  padding-bottom: 0;
+  flex-shrink: 0;
+}
+
+.scrollPad {
+  width: 100%;
+  max-width: min(56rem, 100%);
+  flex-shrink: 0;
+  height: var(--runway-pad);
+  pointer-events: none;
+}
+
+.scrollCue {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 248, 0.48);
+  text-shadow: 0 0 12px rgba(167, 139, 250, 0.25);
+  pointer-events: none;
+}
+
+.frameViewport {
+  position: relative;
+  width: 100%;
+  max-width: min(56rem, 100%);
+  aspect-ratio: 16 / 10;
+  min-height: 200px;
+  max-height: min(58vh, 480px);
+  border-radius: 0.45rem;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  box-shadow:
+    0 0 32px rgba(34, 211, 238, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.frameLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: none;
+  will-change: opacity;
+}
+
+.frameOn {
+  opacity: 1;
+  z-index: 2;
+}
+
+.frameOff {
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(48rem, 100%);
+  /* Cancels scroll pad in layout so “ShroomGPT” sits right under the clip */
+  margin-top: calc(-1 * var(--runway-pad) + 2rem);
+  padding: 0 0 clamp(0.35rem, 1.2vw, 0.75rem);
+  text-align: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.label {
+  width: 100%;
+  margin: 0 auto 0.4rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 248, 0.55);
+  text-shadow: 0 0 14px rgba(167, 139, 250, 0.35);
+}
+
+.title {
+  margin: 0 auto 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: #fafafa;
+  text-shadow:
+    0.04em 0 0 rgba(255, 60, 120, 0.35),
+    -0.04em 0 0 rgba(34, 211, 238, 0.35),
+    0 0 28px rgba(167, 139, 250, 0.25);
+}
+
+.lede {
+  margin: 0 auto 0;
+  max-width: 46rem;
+  font-size: clamp(1rem, 2.1vw, 1.15rem);
+  line-height: 1.65;
+  color: rgba(248, 250, 252, 0.88);
+  text-wrap: pretty;
+  text-shadow:
+    0 0 14px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(0, 0, 0, 0.45);
+}
+
+.embedNote {
+  margin: 0.65rem auto 0;
+  max-width: 40rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(244, 244, 248, 0.5);
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+  line-height: 1.55;
+}

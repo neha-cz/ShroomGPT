@@ -1,0 +1,64 @@
+.section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: clamp(4rem, 12vh, 7rem);
+  background: transparent;
+  overflow: visible;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 52rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 248, 0.5);
+  text-shadow: 0 0 14px rgba(232, 121, 249, 0.35);
+  margin-bottom: 0.85rem;
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.65rem, 4.8vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin: 0 0 clamp(1.75rem, 4vw, 2.5rem);
+  color: #fafafa;
+  text-shadow:
+    0 0 20px rgba(0, 0, 0, 0.88),
+    0 0 40px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(167, 139, 250, 0.4),
+    0 0 48px rgba(232, 121, 249, 0.22);
+}
+
+.wordRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2em 0.35em;
+}
+
+.word {
+  display: inline-block;
+}
+
+.body {
+  margin: 0 auto;
+  max-width: 46rem;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  line-height: 1.75;
+  color: rgba(248, 250, 252, 0.92);
+  text-shadow:
+    0 0 14px rgba(0, 0, 0, 0.85),
+    0 0 32px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.9);
+}

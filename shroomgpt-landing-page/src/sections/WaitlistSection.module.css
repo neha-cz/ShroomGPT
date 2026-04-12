@@ -1,0 +1,114 @@
+.section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-block: clamp(3.5rem, 10vh, 5rem);
+  background: transparent;
+  border-top: 1px solid rgba(167, 139, 250, 0.1);
+}
+
+.inner {
+  width: 100%;
+  max-width: 40rem;
+  text-align: center;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.85rem, 5vw, 3rem);
+  letter-spacing: -0.03em;
+  margin: 0 0 1rem;
+  color: #fafafa;
+  text-shadow:
+    0 0 18px rgba(0, 0, 0, 0.88),
+    0 0 36px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(34, 211, 238, 0.3),
+    0 0 48px rgba(232, 121, 249, 0.18);
+}
+
+.sub {
+  margin: 0 0 2.25rem;
+  color: rgba(248, 250, 252, 0.88);
+  font-size: clamp(1rem, 2.2vw, 1.12rem);
+  line-height: 1.55;
+  text-shadow:
+    0 0 12px rgba(0, 0, 0, 0.85),
+    0 0 24px rgba(0, 0, 0, 0.45);
+}
+
+.form {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .form {
+    flex-direction: column;
+  }
+}
+
+.inputGrow {
+  flex: 1;
+  min-width: 0;
+  transition: transform 0.2s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .inputGrow:focus-within {
+    transform: scale(1.01);
+  }
+}
+
+.submit {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.confirm {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e0fdfa;
+  text-shadow:
+    0 0 16px rgba(74, 222, 128, 0.45),
+    0 0 32px rgba(34, 211, 238, 0.25);
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: clamp(2.5rem, 6vh, 3.5rem);
+  width: 100%;
+  max-width: 48rem;
+}
+
+.rule {
+  height: 1px;
+  width: 100%;
+  margin: 0 auto 1.25rem;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(167, 139, 250, 0.35),
+    rgba(34, 211, 238, 0.35),
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
+}
+
+.footerText {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 248, 0.45);
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.25);
+}
