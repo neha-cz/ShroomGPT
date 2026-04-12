@@ -1,3 +1,3 @@
-psychedelics for gpt 
+ShroomGPT
 
 ![Shroom GPT](Shroom-Landing.png)
