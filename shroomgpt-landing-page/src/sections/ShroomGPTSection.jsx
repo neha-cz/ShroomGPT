@@ -1,28 +1,29 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Container } from "../components/uimax/Container.jsx";
-import { useSectionScrollFrames } from "../hooks/useSectionScrollFrames.js";
+import { WarpText } from "../components/warp/index.js";
+import { ShroomGPTSplineViewport } from "./ShroomGPTSplineViewport.jsx";
 import styles from "./ShroomGPTSection.module.css";
 
-const SECTION_FRAMES = 240;
-const SECTION_FRAME_BASE = "/ezgif-43b1d74becc9df2a-jpg";
+const LEDE_TEXT =
+  "We morph standard LLM transformer architecture—how attention fuses context, how depth stacks abstraction, how feedback loops close—into an altered topology so the model doesn't only predict the next token. It reasons in exploratory jumps, as if its weights were tuned by a shifted state: not random hallucination, but a wider search through hypothesis space. That's ShroomGPT.";
 
-const layerClasses = {
-  on: styles.frameOn,
-  off: styles.frameOff,
-};
+/** Same `scene` URL as `Spline` from `@splinetool/react-spline/next` in your Next.js snippet. */
+const DEFAULT_SPLINE_SCENE =
+  "https://prod.spline.design/wvv3bxhO4Lwl5ObF/scene.splinecode";
+
+const SPLINE_SCENE =
+  import.meta.env.VITE_SPLINE_SCENE_URL?.trim() || DEFAULT_SPLINE_SCENE;
+
+const EMBED_NOTE =
+  "Spline 3D via @splinetool/react-spline/next (Vite aliases next/image). Override scene: VITE_SPLINE_SCENE_URL.";
+
+const SCROLL_CUE =
+  "Scroll the page — this block stays pinned while you move through it";
 
 export function ShroomGPTSection() {
   const reduce = useReducedMotion();
-  /** Only sticky film + pad — NOT the copy block — so frame scrub matches scroll distance */
   const runwayScrubRef = useRef(null);
-  const frame0Ref = useRef(null);
-  const frame1Ref = useRef(null);
-
-  useSectionScrollFrames(runwayScrubRef, frame0Ref, frame1Ref, layerClasses, {
-    totalFrames: SECTION_FRAMES,
-    basePath: SECTION_FRAME_BASE,
-  });
 
   const { scrollYProgress } = useScroll({
     target: runwayScrubRef,
@@ -41,32 +42,24 @@ export function ShroomGPTSection() {
           <div
             ref={runwayScrubRef}
             className={styles.runwayScrub}
-            aria-label="ShroomGPT — scroll advances the sequence"
+            aria-label="ShroomGPT — scroll through this section"
           >
             <div className={styles.stickyInner}>
-              <motion.p
-                className={styles.scrollCue}
+              <motion.div
+                className={styles.warpRow}
                 style={{ opacity: cueOpacity }}
                 aria-hidden="true"
               >
-                Keep scrolling — frames follow the page
-              </motion.p>
+                <WarpText
+                  text={SCROLL_CUE}
+                  className={styles.scrollCue}
+                  typographyClassName={styles.scrollCue}
+                  align="center"
+                />
+              </motion.div>
 
               <div className={styles.frameViewport}>
-                <img
-                  ref={frame0Ref}
-                  className={`${styles.frameLayer} ${styles.frameOn}`}
-                  alt=""
-                  decoding="async"
-                  draggable={false}
-                />
-                <img
-                  ref={frame1Ref}
-                  className={`${styles.frameLayer} ${styles.frameOff}`}
-                  alt=""
-                  decoding="async"
-                  draggable={false}
-                />
+                <ShroomGPTSplineViewport sceneUrl={SPLINE_SCENE} />
               </div>
             </div>
 
@@ -74,8 +67,8 @@ export function ShroomGPTSection() {
           </div>
 
           <div className={styles.copy}>
-            <motion.p
-              className={styles.label}
+            <motion.div
+              className={styles.warpRow}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}
@@ -85,12 +78,19 @@ export function ShroomGPTSection() {
                 ease: "easeOut",
               }}
             >
-              01 / SHROOMGPT
-            </motion.p>
+              <WarpText
+                text="01 / SHROOMGPT"
+                className={styles.label}
+                typographyClassName={styles.label}
+                align="center"
+              />
+            </motion.div>
 
             <motion.h2
               id="shroomgpt-heading"
-              className={styles.title}
+              className={styles.warpRow}
+              aria-label="ShroomGPT"
+              style={{ margin: 0 }}
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}
@@ -100,11 +100,18 @@ export function ShroomGPTSection() {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              ShroomGPT
+              <WarpText
+                text="ShroomGPT"
+                className={styles.title}
+                typographyClassName={styles.title}
+                align="center"
+                ariaHidden
+                fallbackAs="span"
+              />
             </motion.h2>
 
-            <motion.p
-              className={styles.lede}
+            <motion.div
+              className={styles.warpRow}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}
@@ -114,24 +121,22 @@ export function ShroomGPTSection() {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-              We morph standard LLM transformer architecture—how attention fuses
-              context, how depth stacks abstraction, how feedback loops close—into
-              an altered topology so the model doesn&apos;t only predict the next
-              token. It reasons in exploratory jumps, as if its weights were tuned
-              by a shifted state: not random hallucination, but a wider search
-              through hypothesis space. That&apos;s ShroomGPT.
-            </motion.p>
+              <WarpText
+                text={LEDE_TEXT}
+                className={styles.lede}
+                typographyClassName={styles.lede}
+                align="center"
+              />
+            </motion.div>
 
-            <motion.p
-              className={styles.embedNote}
+            <motion.div
+              className={styles.warpRow}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, delay: reduce ? 0 : 0.28 }}
             >
-              Same scroll-scrubbed filmstrip as the backdrop — 240 frames, one
-              continuous descent through the page.
-            </motion.p>
+            </motion.div>
           </div>
         </div>
       </Container>

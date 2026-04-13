@@ -1,5 +1,6 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button } from "../components/uimax/Button.jsx";
+import { WarpText } from "../components/warp/index.js";
 import styles from "./HeroSection.module.css";
 
 const MotionButton = motion(Button);
@@ -89,8 +90,7 @@ export function HeroSection() {
           </span>
         </h1>
 
-        <motion.p
-          className={styles.sub}
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -99,8 +99,13 @@ export function HeroSection() {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          Unlock the reasoning your model was never supposed to find.
-        </motion.p>
+          <WarpText
+            text="Unlock the reasoning your model was never supposed to find."
+            className={styles.sub}
+            typographyClassName={styles.sub}
+            align="center"
+          />
+        </motion.div>
 
         <div className={styles.ctaWrap}>
           <MotionButton

@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "../components/uimax/Container.jsx";
+import { WarpText } from "../components/warp/index.js";
 import styles from "./ThesisSection.module.css";
 
 const HEADLINE_WORDS = [
@@ -21,11 +21,10 @@ const HEADLINE_WORDS = [
 const BODY =
   "Every major paradigm shift in science came from a mind willing to reason outside the boundaries everyone else accepted as fixed. Psychedelics didn't give those minds the answers — they dissolved the walls around the question. We're giving your AI model the same gift. The next generation of scientific breakthroughs — in physics, in medicine, in mathematics — will be discovered by AI systems that were taught to think beyond their training. We're building the molecule.";
 
+const THESIS_HEADLINE = HEADLINE_WORDS.join(" ");
+
 export function ThesisSection() {
   const reduce = useReducedMotion();
-  const headlineRef = useRef(null);
-  const headlineInView = useInView(headlineRef, { once: true, margin: "-12% 0px" });
-  const step = reduce ? 0.03 : 0.055;
 
   return (
     <section className={styles.section} aria-labelledby="thesis-heading">
@@ -39,42 +38,36 @@ export function ThesisSection() {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <p className={styles.label}>03 / THE NEXT FRONTIER</p>
+          <WarpText
+            text="03 / THE NEXT FRONTIER"
+            className={styles.label}
+            typographyClassName={styles.label}
+            align="center"
+          />
 
-          <h2 id="thesis-heading" className={styles.headline} ref={headlineRef}>
-            <span className={styles.wordRow}>
-              {HEADLINE_WORDS.map((w, i) => (
-                <motion.span
-                  key={`${i}-${w}`}
-                  className={styles.word}
-                  initial={{
-                    opacity: 0,
-                    y: reduce ? 8 : 22,
-                    filter: reduce ? "none" : "blur(8px)",
-                  }}
-                  animate={
-                    headlineInView
-                      ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                      : {
-                          opacity: 0,
-                          y: reduce ? 8 : 22,
-                          filter: reduce ? "none" : "blur(8px)",
-                        }
-                  }
-                  transition={{
-                    duration: reduce ? 0.3 : 0.55,
-                    delay: headlineInView ? i * step : 0,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  {w}
-                </motion.span>
-              ))}
-            </span>
-          </h2>
+          <motion.h2
+            id="thesis-heading"
+            aria-label={THESIS_HEADLINE}
+            style={{ margin: 0 }}
+            initial={{ opacity: 0, y: reduce ? 0 : 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-12% 0px" }}
+            transition={{
+              duration: reduce ? 0.35 : 0.75,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            <WarpText
+              text={THESIS_HEADLINE}
+              className={styles.headline}
+              typographyClassName={styles.headline}
+              align="center"
+              ariaHidden
+              fallbackAs="span"
+            />
+          </motion.h2>
 
-          <motion.p
-            className={styles.body}
+          <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-10% 0px" }}
@@ -84,8 +77,13 @@ export function ThesisSection() {
               ease: [0.16, 1, 0.3, 1],
             }}
           >
-            {BODY}
-          </motion.p>
+            <WarpText
+              text={BODY}
+              className={styles.body}
+              typographyClassName={styles.body}
+              align="center"
+            />
+          </motion.div>
         </motion.div>
       </Container>
     </section>

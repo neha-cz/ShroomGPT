@@ -1,0 +1,17 @@
+.root {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  pointer-events: none;
+  margin: -26px 0 0 -22px;
+  transform: translate3d(var(--mush-x, 50vw), var(--mush-y, 50vh), 0);
+  will-change: transform;
+  filter:
+    drop-shadow(0 0 10px rgba(232, 121, 249, 0.55))
+    drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
+}
+
+.svg {
+  display: block;
+}

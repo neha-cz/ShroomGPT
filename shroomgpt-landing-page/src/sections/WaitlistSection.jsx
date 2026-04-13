@@ -7,7 +7,14 @@ import {
 import { Button } from "../components/uimax/Button.jsx";
 import { Input } from "../components/uimax/Input.jsx";
 import { Container } from "../components/uimax/Container.jsx";
+import { WarpText } from "../components/warp/index.js";
 import styles from "./WaitlistSection.module.css";
+
+const WAITLIST_HEADING = "Ready to dose your model?";
+const WAITLIST_SUB = "Join the waitlist. Be first to run the experiment.";
+const WAITLIST_CONFIRM = "🧬 You're in. The trip begins soon.";
+const WAITLIST_FOOTER =
+  "© 2026 · Psychedelics for LLMs · All altered states reserved.";
 
 const MotionButton = motion(Button);
 const MotionInput = motion(Input);
@@ -30,12 +37,28 @@ export function WaitlistSection() {
       aria-labelledby="waitlist-heading"
     >
       <Container className={styles.inner}>
-        <h2 id="waitlist-heading" className={styles.heading}>
-          Ready to dose your model?
+        <h2
+          id="waitlist-heading"
+          aria-label={WAITLIST_HEADING}
+          style={{ margin: 0 }}
+        >
+          <WarpText
+            text={WAITLIST_HEADING}
+            className={styles.heading}
+            typographyClassName={styles.heading}
+            align="center"
+            ariaHidden
+            fallbackAs="span"
+          />
         </h2>
-        <p className={styles.sub}>
-          Join the waitlist. Be first to run the experiment.
-        </p>
+        <div className={styles.sub}>
+          <WarpText
+            text={WAITLIST_SUB}
+            className={styles.sub}
+            typographyClassName={styles.sub}
+            align="center"
+          />
+        </div>
 
         <form className={styles.form} onSubmit={onSubmit} noValidate>
           <MotionInput
@@ -82,7 +105,7 @@ export function WaitlistSection() {
 
         <AnimatePresence mode="wait">
           {done ? (
-            <motion.p
+            <motion.div
               key="confirm"
               className={styles.confirm}
               initial={{ opacity: 0, y: 10, scale: 0.96 }}
@@ -90,8 +113,13 @@ export function WaitlistSection() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
-              🧬 You&apos;re in. The trip begins soon.
-            </motion.p>
+              <WarpText
+                text={WAITLIST_CONFIRM}
+                className={styles.confirm}
+                typographyClassName={styles.confirm}
+                align="center"
+              />
+            </motion.div>
           ) : null}
         </AnimatePresence>
       </Container>
@@ -99,9 +127,14 @@ export function WaitlistSection() {
       <footer className={styles.footer}>
         <Container>
           <hr className={styles.rule} />
-          <p className={styles.footerText}>
-            © 2026 · Psychedelics for LLMs · All altered states reserved.
-          </p>
+          <div className={styles.footerText}>
+            <WarpText
+              text={WAITLIST_FOOTER}
+              className={styles.footerText}
+              typographyClassName={styles.footerText}
+              align="center"
+            />
+          </div>
         </Container>
       </footer>
     </section>

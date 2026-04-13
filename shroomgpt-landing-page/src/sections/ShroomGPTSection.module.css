@@ -46,6 +46,13 @@
   pointer-events: none;
 }
 
+/* Flex parents use align-items: center — stretch text rows so WarpText/canvas measure full width */
+.warpRow {
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+}
+
 .scrollCue {
   margin: 0;
   font-size: 0.68rem;
@@ -72,26 +79,22 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.frameLayer {
+.splineRoot {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  overflow: hidden;
+}
+
+.splineRoot :global(canvas) {
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover;
-  display: block;
-  transition: none;
-  will-change: opacity;
 }
 
-.frameOn {
-  opacity: 1;
-  z-index: 2;
-}
-
-.frameOff {
-  opacity: 0;
-  z-index: 1;
-  pointer-events: none;
+.splineFallback {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .copy {

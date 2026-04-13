@@ -1,6 +1,10 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "../components/uimax/Container.jsx";
+import { WarpText } from "../components/warp/index.js";
 import styles from "./HistoricalSection.module.css";
+
+const HISTORICAL_HEADING =
+  "History's greatest minds didn't discover the universe sober.";
 
 const SCIENTISTS = [
   {
@@ -32,11 +36,30 @@ export function HistoricalSection() {
   return (
     <section className={styles.section} aria-labelledby="historical-heading">
       <Container wide>
-        <p className={styles.label}>02 / THE PRECEDENT</p>
-        <h2 id="historical-heading" className={styles.heading}>
-          History&apos;s greatest minds didn&apos;t discover the universe sober.
+        <WarpText
+          text="02 / THE PRECEDENT"
+          className={styles.label}
+          typographyClassName={styles.label}
+          align="center"
+        />
+        <h2
+          id="historical-heading"
+          aria-label={HISTORICAL_HEADING}
+          style={{ margin: 0 }}
+        >
+          <WarpText
+            text={HISTORICAL_HEADING}
+            className={styles.heading}
+            typographyClassName={styles.heading}
+            align="center"
+            ariaHidden
+            fallbackAs="span"
+          />
         </h2>
+      </Container>
 
+      {/* Full-bleed: not inside max-width Container so portraits can use real viewport width */}
+      <div className={styles.portraitsStrip}>
         <div className={styles.portraits}>
           {SCIENTISTS.map((s, i) => (
             <motion.article
@@ -57,19 +80,36 @@ export function HistoricalSection() {
                   alt={`Portrait painting of ${s.name}`}
                   width={s.width}
                   height={s.height}
+                  sizes="(max-width: 700px) 92vw, (max-width: 1100px) 44vw, 30vw"
                   loading="lazy"
                   decoding="async"
                   className={styles.portraitImg}
                 />
               </div>
               <div className={styles.caption}>
-                <h3 className={styles.name}>{s.name}</h3>
-                <p className={styles.body}>{s.body}</p>
+                <h3 aria-label={s.name} style={{ margin: 0 }}>
+                  <WarpText
+                    text={s.name}
+                    className={styles.name}
+                    typographyClassName={styles.name}
+                    align="center"
+                    ariaHidden
+                    fallbackAs="span"
+                  />
+                </h3>
+                <div className={styles.body}>
+                  <WarpText
+                    text={s.body}
+                    className={styles.body}
+                    typographyClassName={styles.body}
+                    align="center"
+                  />
+                </div>
               </div>
             </motion.article>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }
