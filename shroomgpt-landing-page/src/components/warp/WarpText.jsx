@@ -15,6 +15,7 @@ import {
 import { mushroomStore } from "./mushroomStore.js";
 import styles from "./WarpText.module.css";
 
+/** Pretext line reflow around the cursor — only when pointer is close (tight ellipse). */
 function lineBreakWidth(fullW, lineTop, lineH, mx, my, rx, ry, gap) {
   const lc = lineTop + lineH / 2;
   const safeRy = Math.max(ry, 1);
@@ -25,6 +26,16 @@ function lineBreakWidth(fullW, lineTop, lineH, mx, my, rx, ry, gap) {
   if (obstacleLeft > fullW - gap) return fullW;
   const w = obstacleLeft - gap;
   return Math.max(72, Math.min(fullW, w));
+}
+
+/** True when the pointer is near this text box (screen coords). */
+function pointerEngagesText(clientX, clientY, rect, padPx) {
+  return (
+    clientX >= rect.left - padPx &&
+    clientX <= rect.right + padPx &&
+    clientY >= rect.top - padPx &&
+    clientY <= rect.bottom + padPx
+  );
 }
 
 function alignOffset(align, fullW, lineWidth) {
@@ -104,10 +115,12 @@ export function WarpText({
     const fontSize = parseFloat(cs.fontSize) || 16;
     const rect = wrap.getBoundingClientRect();
     const { clientX, clientY, scrollY } = mushroomStore;
+    const engaged = pointerEngagesText(clientX, clientY, rect, 36);
     const mx = clientX - rect.left;
     const my = clientY - rect.top;
-    const rx = 56;
-    const ry = 44 + Math.min(22, scrollY * 0.006);
+    /* Narrower obstacle = line reflow only when the cursor is actually over/near copy */
+    const rx = 38;
+    const ry = 30 + Math.min(14, scrollY * 0.004);
     const gap = 10;
 
     const ctx = canvas.getContext("2d");
@@ -117,7 +130,9 @@ export function WarpText({
     let y = 0;
     const lines = [];
     while (true) {
-      const breakW = lineBreakWidth(fullW, y, lineHeight, mx, my, rx, ry, gap);
+      const breakW = engaged
+        ? lineBreakWidth(fullW, y, lineHeight, mx, my, rx, ry, gap)
+        : fullW;
       const range = layoutNextLineRange(preparedNow, cursor, breakW);
       if (!range) break;
       const line = materializeLineRange(preparedNow, range);
@@ -152,7 +167,14 @@ export function WarpText({
       const dx = lineCx - mx;
       const dy = lineCy - my;
       const dist = Math.hypot(dx, dy);
-      const infl = Math.exp(-(dist * dist) / (280 * 280));
+      /* Tight falloff + hard cap so bend/rotate only when the cursor is on/near glyphs */
+      const WARP_SIGMA = 78;
+      const WARP_MAX = 112;
+      const infl = engaged
+        ? dist > WARP_MAX
+          ? 0
+          : Math.exp(-(dist * dist) / (WARP_SIGMA * WARP_SIGMA))
+        : 0;
       const bendX =
         6 * infl * Math.sin(phase + lineTop * 0.09 + clientX * 0.008);
       const rot =

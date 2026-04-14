@@ -12,6 +12,9 @@
     drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
 }
 
-.svg {
+.img {
   display: block;
+  width: 44px;
+  height: 52px;
+  object-fit: contain;
 }

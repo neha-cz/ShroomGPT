@@ -1,9 +1,12 @@
 .section {
-  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  min-height: min(100vh, 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding-block: clamp(3rem, 8vh, 5rem);
+  margin-inline: auto;
 }
 
 .inner {
@@ -64,6 +67,17 @@
 .word {
   display: inline-block;
   transform-origin: 50% 80%;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.space {
+  display: inline-block;
+  width: 0.32em;
 }
 
 .sub {

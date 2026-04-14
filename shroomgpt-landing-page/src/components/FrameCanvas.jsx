@@ -1,17 +1,26 @@
 import { useRef } from "react";
 import styles from "./FrameCanvas.module.css";
-import { useScrollDrivenDoubleBuffer } from "../hooks/useScrollDrivenFrame.js";
+import {
+  FRAME_COUNT,
+  useScrollDrivenDoubleBuffer,
+} from "../hooks/useScrollDrivenFrame.js";
 
 const layerClasses = {
   on: styles.layerOn,
   off: styles.layerOff,
 };
 
-export function FrameCanvas() {
+export function FrameCanvas({ frozenFrameIndex = null }) {
   const img0Ref = useRef(null);
   const img1Ref = useRef(null);
 
-  useScrollDrivenDoubleBuffer(img0Ref, img1Ref, layerClasses);
+  useScrollDrivenDoubleBuffer(
+    img0Ref,
+    img1Ref,
+    layerClasses,
+    FRAME_COUNT,
+    frozenFrameIndex
+  );
 
   return (
     <div className={styles.wrap} aria-hidden="true">

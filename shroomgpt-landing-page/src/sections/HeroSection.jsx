@@ -8,7 +8,39 @@ const MotionButton = motion(Button);
 const line1 = ["YOUR", "AI", "ON", "/"];
 const line2 = ["DRUGS."];
 
-function Word({ children, delay, reduce }) {
+function pseudoRandom(seed) {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453123;
+  return x - Math.floor(x);
+}
+
+function Letter({ ch, index, progress, reduce }) {
+  if (ch === " ") return <span className={styles.space} aria-hidden>{ch}</span>;
+  if (reduce) return <span className={styles.letter}>{ch}</span>;
+
+  const SCATTER_START = 0;
+  const SCATTER_END = 0.45;
+  const dirX = pseudoRandom(index + 1) * 2 - 1;
+  const dirY = pseudoRandom(index + 41) * 2 - 1;
+  const driftX = useTransform(progress, [SCATTER_START, SCATTER_END], [0, dirX * 280]);
+  const driftY = useTransform(
+    progress,
+    [SCATTER_START, SCATTER_END],
+    [0, dirY * 210 - (90 + pseudoRandom(index + 77) * 70)]
+  );
+  const spin = useTransform(progress, [SCATTER_START, SCATTER_END], [0, (pseudoRandom(index + 101) * 2 - 1) * 46]);
+  const fade = useTransform(progress, [SCATTER_START, SCATTER_END], [1, 0.08]);
+
+  return (
+    <motion.span
+      className={styles.letter}
+      style={{ x: driftX, y: driftY, rotate: spin, opacity: fade }}
+    >
+      {ch}
+    </motion.span>
+  );
+}
+
+function Word({ children, delay, reduce, progress, wordIndex }) {
   return (
     <motion.span
       className={styles.word}
@@ -24,42 +56,44 @@ function Word({ children, delay, reduce }) {
         delay,
       }}
     >
-      {children}
+      {Array.from(children).map((ch, i) => (
+        <Letter
+          key={`${ch}-${i}`}
+          ch={ch}
+          index={wordIndex * 24 + i}
+          progress={progress}
+          reduce={reduce}
+        />
+      ))}
     </motion.span>
   );
 }
 
-export function HeroSection() {
+export function HeroSection({ scrollRootRef }) {
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.14]);
-  const heroBlur = useTransform(
-    scrollYProgress,
-    [0, 0.2],
-    reduce ? [0, 0] : [0, 6]
-  );
-  const heroFilter = useTransform(heroBlur, (v) => `blur(${v}px)`);
+  const { scrollYProgress } = useScroll({
+    target: scrollRootRef,
+    offset: ["start start", "end start"],
+  });
+  const badgeFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+  const descFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+  const ctaFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
   const baseDelay = reduce ? 0.08 : 0.45;
   const step = reduce ? 0.04 : 0.09;
 
   const scrollToWaitlist = () => {
-    document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("waitlist")?.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+    });
   };
 
   return (
     <section className={styles.section} aria-label="Hero">
-      <motion.div
-        className={styles.inner}
-        style={{
-          opacity: heroOpacity,
-          scale: heroScale,
-          filter: heroFilter,
-        }}
-      >
+      <motion.div className={styles.inner}>
         <motion.div
           className={styles.badge}
+          style={{ opacity: reduce ? 1 : badgeFade }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: reduce ? 0 : 0.3, ease: "easeOut" }}
@@ -71,7 +105,13 @@ export function HeroSection() {
           <span className={styles.headlineLines}>
             <span className={styles.wordRow}>
               {line1.map((w, i) => (
-                <Word key={w} delay={baseDelay + i * step} reduce={reduce}>
+                <Word
+                  key={w}
+                  delay={baseDelay + i * step}
+                  reduce={reduce}
+                  progress={scrollYProgress}
+                  wordIndex={i}
+                >
                   {w}
                 </Word>
               ))}
@@ -82,6 +122,8 @@ export function HeroSection() {
                   key={w}
                   delay={baseDelay + (line1.length + j) * step}
                   reduce={reduce}
+                  progress={scrollYProgress}
+                  wordIndex={line1.length + j}
                 >
                   {w}
                 </Word>
@@ -91,6 +133,7 @@ export function HeroSection() {
         </h1>
 
         <motion.div
+          style={{ opacity: reduce ? 1 : descFade }}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -107,7 +150,10 @@ export function HeroSection() {
           />
         </motion.div>
 
-        <div className={styles.ctaWrap}>
+        <motion.div
+          className={styles.ctaWrap}
+          style={{ opacity: reduce ? 1 : ctaFade }}
+        >
           <MotionButton
             type="button"
             className={styles.cta}
@@ -133,7 +179,7 @@ export function HeroSection() {
           >
             BEGIN THE TRIP
           </MotionButton>
-        </div>
+        </motion.div>
       </motion.div>
     </section>
   );
