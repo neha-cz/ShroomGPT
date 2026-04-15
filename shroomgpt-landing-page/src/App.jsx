@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CinematicFrameCanvas } from "./components/CinematicFrameCanvas.jsx";
 import { FrameCanvas } from "./components/FrameCanvas.jsx";
 import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js";
 import { HeroSection } from "./sections/HeroSection.jsx";
@@ -21,10 +22,11 @@ function runwayScrollEndPx(spacerEl) {
 
 export default function App() {
   const spacerRef = useRef(null);
-  const historicalRef = useRef(null);
+  const cinematicSpacerRef = useRef(null);
   const [heroOverlayOn, setHeroOverlayOn] = useState(true);
   const [sectionsUnlocked, setSectionsUnlocked] = useState(false);
-  const [whiteBackdropAlpha, setWhiteBackdropAlpha] = useState(0);
+  const [cinematicBackdropAlpha, setCinematicBackdropAlpha] = useState(0);
+  const [cinematicOverlayOn, setCinematicOverlayOn] = useState(false);
   /** Once the user scrolls past the runway, keep the overlay off until they return ~to top. */
   const leftRunwayRef = useRef(false);
 
@@ -48,6 +50,23 @@ export default function App() {
     setHeroOverlayOn(show);
   }, [sectionsUnlocked]);
 
+  const syncCinematicOverlay = useCallback(() => {
+    if (!sectionsUnlocked) {
+      setCinematicOverlayOn(false);
+      return;
+    }
+    const el = cinematicSpacerRef.current;
+    if (!el) {
+      setCinematicOverlayOn(false);
+      return;
+    }
+    const start = el.getBoundingClientRect().top + window.scrollY;
+    const range = runwayScrollEndPx(el);
+    const y = window.scrollY;
+    const on = y >= start - 2 && y <= start + range + 2;
+    setCinematicOverlayOn(on);
+  }, [sectionsUnlocked]);
+
   useEffect(() => {
     syncHeroOverlay();
     window.addEventListener("scroll", syncHeroOverlay, { passive: true });
@@ -59,22 +78,31 @@ export default function App() {
   }, [syncHeroOverlay]);
 
   useEffect(() => {
+    syncCinematicOverlay();
+    window.addEventListener("scroll", syncCinematicOverlay, { passive: true });
+    window.addEventListener("resize", syncCinematicOverlay, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", syncCinematicOverlay);
+      window.removeEventListener("resize", syncCinematicOverlay);
+    };
+  }, [syncCinematicOverlay]);
+
+  useEffect(() => {
     if (!sectionsUnlocked) {
-      setWhiteBackdropAlpha(0);
+      setCinematicBackdropAlpha(0);
       return;
     }
     const updateFade = () => {
-      const node = historicalRef.current;
+      const node = cinematicSpacerRef.current;
       if (!node) {
-        setWhiteBackdropAlpha(0);
+        setCinematicBackdropAlpha(0);
         return;
       }
       const rect = node.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      /* 0 while Historical starts below viewport; ramps to 1 as it reaches top. */
-      const t = (vh - rect.top) / (vh * 0.9);
+      const t = (2 * vh - rect.top) / vh;
       const alpha = Math.min(1, Math.max(0, t));
-      setWhiteBackdropAlpha(alpha);
+      setCinematicBackdropAlpha(alpha);
     };
     updateFade();
     window.addEventListener("scroll", updateFade, { passive: true });
@@ -89,17 +117,21 @@ export default function App() {
     <MushroomFieldProvider>
       <MushroomIcon />
       <FrameCanvas frozenFrameIndex={sectionsUnlocked ? 0 : null} />
+      <CinematicFrameCanvas
+        runwayRef={cinematicSpacerRef}
+        visible={cinematicOverlayOn}
+      />
       {sectionsUnlocked ? (
         <>
           <div
             className={styles.overlay}
             aria-hidden="true"
-            style={{ opacity: 1 - whiteBackdropAlpha }}
+            style={{ opacity: 1 - cinematicBackdropAlpha }}
           />
           <div
-            className={styles.whiteBackdrop}
+            className={styles.cinematicBackdrop}
             aria-hidden="true"
-            style={{ opacity: whiteBackdropAlpha }}
+            style={{ opacity: cinematicBackdropAlpha }}
           />
         </>
       ) : (
@@ -118,9 +150,12 @@ export default function App() {
         {sectionsUnlocked ? (
           <>
             <ShroomGPTSection />
-            <div ref={historicalRef}>
-              <HistoricalSection />
-            </div>
+            <div
+              ref={cinematicSpacerRef}
+              className={styles.cinematicSpacer}
+              aria-hidden="true"
+            />
+            <HistoricalSection />
             <ThesisSection />
             <WaitlistSection />
           </>

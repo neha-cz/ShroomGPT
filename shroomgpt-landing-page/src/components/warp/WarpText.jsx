@@ -84,9 +84,17 @@ export function WarpText({
   useLayoutEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setBoxW(el.clientWidth));
+    const setStableWidth = () => {
+      const w = el.clientWidth;
+      setBoxW((prev) => {
+        const rounded = Math.round(w);
+        if (Math.abs(prev - rounded) < 2) return prev;
+        return rounded;
+      });
+    };
+    const ro = new ResizeObserver(setStableWidth);
     ro.observe(el);
-    setBoxW(el.clientWidth);
+    setStableWidth();
     return () => ro.disconnect();
   }, []);
 
@@ -116,9 +124,10 @@ export function WarpText({
     const rect = wrap.getBoundingClientRect();
     const { clientX, clientY, scrollY } = mushroomStore;
     const engaged = pointerEngagesText(clientX, clientY, rect, 36);
-    const mx = clientX - rect.left;
-    const my = clientY - rect.top;
-    /* Narrower obstacle = line reflow only when the cursor is actually over/near copy */
+    const mxRaw = clientX - rect.left;
+    const myRaw = clientY - rect.top;
+    const mxBreak = Math.round(mxRaw / 4) * 4;
+    const myBreak = Math.round(myRaw / 4) * 4;
     const rx = 38;
     const ry = 30 + Math.min(14, scrollY * 0.004);
     const gap = 10;
@@ -131,7 +140,7 @@ export function WarpText({
     const lines = [];
     while (true) {
       const breakW = engaged
-        ? lineBreakWidth(fullW, y, lineHeight, mx, my, rx, ry, gap)
+        ? lineBreakWidth(fullW, y, lineHeight, mxBreak, myBreak, rx, ry, gap)
         : fullW;
       const range = layoutNextLineRange(preparedNow, cursor, breakW);
       if (!range) break;
@@ -143,10 +152,14 @@ export function WarpText({
 
     const totalH = Math.max(y + lineHeight * 0.35, lineHeight);
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(fullW * dpr);
-    canvas.height = Math.floor(totalH * dpr);
-    canvas.style.width = `${fullW}px`;
-    canvas.style.height = `${totalH}px`;
+    const needW = Math.floor(fullW * dpr);
+    const needH = Math.floor(totalH * dpr);
+    if (canvas.width !== needW || canvas.height !== needH) {
+      canvas.width = needW;
+      canvas.height = needH;
+      canvas.style.width = `${fullW}px`;
+      canvas.style.height = `${totalH}px`;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, fullW, totalH);
     ctx.font = font;
@@ -164,8 +177,8 @@ export function WarpText({
       const lx = alignOffset(align, fullW, line.width);
       const lineCx = lx + line.width / 2;
       const lineCy = baseline;
-      const dx = lineCx - mx;
-      const dy = lineCy - my;
+      const dx = lineCx - mxRaw;
+      const dy = lineCy - myRaw;
       const dist = Math.hypot(dx, dy);
       /* Tight falloff + hard cap so bend/rotate only when the cursor is on/near glyphs */
       const WARP_SIGMA = 78;
