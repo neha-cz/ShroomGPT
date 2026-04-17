@@ -1,3 +1,4 @@
+import { AutoplayFrameFilm } from "../components/AutoplayFrameFilm.jsx";
 import { Container } from "../components/uimax/Container.jsx";
 import { WarpText } from "../components/warp/index.js";
 import styles from "./ShroomGPTSection.module.css";
@@ -55,6 +56,8 @@ export function ShroomGPTSection() {
             </strong>
             {LEDE_AFTER}
           </p>
+
+          <AutoplayFrameFilm className={styles.film} />
         </div>
       </Container>
     </section>

@@ -62,8 +62,8 @@
 }
 
 /**
- * Scroll runway for the cinematic JPEG strip — same idea as `.heroSpacer`.
- * Taller = slower scrub through all frames before Historical.
+ * Scroll runway between ShroomGPT and Historical — drives the overlay ↔ cinematic
+ * backdrop cross-fade (same idea as `.heroSpacer` for the hero).
  */
 .cinematicSpacer {
   flex-shrink: 0;

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CinematicFrameCanvas } from "./components/CinematicFrameCanvas.jsx";
 import { FrameCanvas } from "./components/FrameCanvas.jsx";
 import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js";
 import { HeroSection } from "./sections/HeroSection.jsx";
@@ -26,7 +25,6 @@ export default function App() {
   const [heroOverlayOn, setHeroOverlayOn] = useState(true);
   const [sectionsUnlocked, setSectionsUnlocked] = useState(false);
   const [cinematicBackdropAlpha, setCinematicBackdropAlpha] = useState(0);
-  const [cinematicOverlayOn, setCinematicOverlayOn] = useState(false);
   /** Once the user scrolls past the runway, keep the overlay off until they return ~to top. */
   const leftRunwayRef = useRef(false);
 
@@ -50,23 +48,6 @@ export default function App() {
     setHeroOverlayOn(show);
   }, [sectionsUnlocked]);
 
-  const syncCinematicOverlay = useCallback(() => {
-    if (!sectionsUnlocked) {
-      setCinematicOverlayOn(false);
-      return;
-    }
-    const el = cinematicSpacerRef.current;
-    if (!el) {
-      setCinematicOverlayOn(false);
-      return;
-    }
-    const start = el.getBoundingClientRect().top + window.scrollY;
-    const range = runwayScrollEndPx(el);
-    const y = window.scrollY;
-    const on = y >= start - 2 && y <= start + range + 2;
-    setCinematicOverlayOn(on);
-  }, [sectionsUnlocked]);
-
   useEffect(() => {
     syncHeroOverlay();
     window.addEventListener("scroll", syncHeroOverlay, { passive: true });
@@ -76,16 +57,6 @@ export default function App() {
       window.removeEventListener("resize", syncHeroOverlay);
     };
   }, [syncHeroOverlay]);
-
-  useEffect(() => {
-    syncCinematicOverlay();
-    window.addEventListener("scroll", syncCinematicOverlay, { passive: true });
-    window.addEventListener("resize", syncCinematicOverlay, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", syncCinematicOverlay);
-      window.removeEventListener("resize", syncCinematicOverlay);
-    };
-  }, [syncCinematicOverlay]);
 
   useEffect(() => {
     if (!sectionsUnlocked) {
@@ -100,7 +71,9 @@ export default function App() {
       }
       const rect = node.getBoundingClientRect();
       const vh = window.innerHeight || 1;
-      const t = (2 * vh - rect.top) / vh;
+      /* Shift curve so the cinematic / “fade to black” completes sooner (less scroll lag). */
+      const headStartVh = 0.38;
+      const t = ((2 + headStartVh) * vh - rect.top) / vh;
       const alpha = Math.min(1, Math.max(0, t));
       setCinematicBackdropAlpha(alpha);
     };
@@ -117,10 +90,6 @@ export default function App() {
     <MushroomFieldProvider>
       <MushroomIcon />
       <FrameCanvas frozenFrameIndex={sectionsUnlocked ? 0 : null} />
-      <CinematicFrameCanvas
-        runwayRef={cinematicSpacerRef}
-        visible={cinematicOverlayOn}
-      />
       {sectionsUnlocked ? (
         <>
           <div
