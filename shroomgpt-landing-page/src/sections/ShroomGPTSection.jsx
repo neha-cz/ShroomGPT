@@ -15,7 +15,13 @@ const TITLE_GRADIENT = {
 
 const LEDE_BEFORE = `Psychedelics, in our framework, are transformations of the brain's cognitive energy landscape, deforming the topology of thought the way mass curves spacetime. We simulate this using Einstein's Field Equations, treating the neural state space as a Riemannian manifold whose curvature evolves under pharmacological forcing. The resulting geometric transformation is then injected directly into the LLM architecture, altering the topology of the model's internal reasoning space, `;
 
-const LEDE_AFTER = `. The output is a model that thinks beyond its training.`;
+const LEDE_AFTER = `.`;
+
+const LEDE_BELOW_FILM_BEFORE =
+  "The result is a model whose internal reasoning geometry has been fundamentally altered — the same way a psychedelic experience ";
+
+const LEDE_BELOW_FILM_AFTER =
+  ". ShroomGPT doesn't simply generate creative output. It reasons from a place most models cannot reach.";
 
 export function ShroomGPTSection() {
   return (
@@ -58,6 +64,14 @@ export function ShroomGPTSection() {
           </p>
 
           <AutoplayFrameFilm className={styles.film} />
+
+          <p className={`${styles.lede} ${styles.ledeBelowFilm}`}>
+            {LEDE_BELOW_FILM_BEFORE}
+            <strong className={styles.ledeEmphasis}>
+              changes the space of what is thinkable
+            </strong>
+            {LEDE_BELOW_FILM_AFTER}
+          </p>
         </div>
       </Container>
     </section>
