@@ -54,6 +54,8 @@ export function WarpText({
   typographyClassName = "",
   className = "",
   canvasClassName = "",
+  /** Optional horizontal gradient for canvas text: `{ stops: [[0, '#fbcfe8'], [1, '#a855f7']] }` */
+  canvasGradient = null,
   ariaLabel,
   ariaHidden = false,
   /** Use "span" when this replaces copy inside a heading so reduced-motion fallback stays valid HTML. */
@@ -163,12 +165,27 @@ export function WarpText({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, fullW, totalH);
     ctx.font = font;
-    ctx.fillStyle = color;
+    if (canvasGradient?.stops?.length) {
+      const g = ctx.createLinearGradient(0, 0, fullW, 0);
+      for (const [t, c] of canvasGradient.stops) {
+        g.addColorStop(t, c);
+      }
+      ctx.fillStyle = g;
+    } else {
+      ctx.fillStyle = color;
+    }
     ctx.textBaseline = "alphabetic";
-    ctx.shadowColor = "rgba(0,0,0,0.55)";
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 2;
+    if (canvasGradient?.stops?.length) {
+      ctx.shadowColor = "rgba(192, 132, 252, 0.5)";
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    } else {
+      ctx.shadowColor = "rgba(0,0,0,0.55)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 2;
+    }
 
     const phase = scrollY * 0.0035;
 
@@ -200,7 +217,7 @@ export function WarpText({
       ctx.fillText(line.text, lx + bendX, baseline);
       ctx.restore();
     }
-  }, [align]);
+  }, [align, canvasGradient]);
 
   useEffect(() => {
     if (reduce) return;
