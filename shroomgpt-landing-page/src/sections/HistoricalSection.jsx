@@ -14,13 +14,6 @@ const SCIENTISTS = [
     body: "The molecular biologist who cracked the structure of DNA reportedly used LSD to visualize molecular geometries that conventional thinking couldn't reach. He described the experience as allowing him to think in entirely new dimensions.",
   },
   {
-    name: "Kary Mullis",
-    image: "mallis.png",
-    width: 800,
-    height: 970,
-    body: "The Nobel Prize-winning chemist who invented PCR — now foundational to modern medicine — directly credited LSD with the lateral thinking leap that made his discovery possible. He later asked openly: what if he had never taken it?",
-  },
-  {
     name: "Richard Feynman",
     image: "feynman.png",
     width: 930,
@@ -29,20 +22,25 @@ const SCIENTISTS = [
   },
 ];
 
-export function HistoricalSection() {
+export function HistoricalSection({ className } = {}) {
   const reduce = useReducedMotion();
 
   return (
-    <section className={styles.section} aria-labelledby="historical-heading">
+    <section
+      className={[styles.section, className].filter(Boolean).join(" ")}
+      aria-labelledby="historical-heading"
+    >
       <Container wide>
-        <p className={styles.label}>02 / THE PRECEDENT</p>
-        <h2
-          id="historical-heading"
-          aria-label={HISTORICAL_HEADING}
-          style={{ margin: 0 }}
-        >
-          <span className={styles.heading}>{HISTORICAL_HEADING}</span>
-        </h2>
+        <div className={styles.intro}>
+          <p className={styles.label}>02 / THE PRECEDENT</p>
+          <h2
+            id="historical-heading"
+            aria-label={HISTORICAL_HEADING}
+            style={{ margin: 0 }}
+          >
+            <span className={styles.heading}>{HISTORICAL_HEADING}</span>
+          </h2>
+        </div>
       </Container>
 
       {/* Full-bleed: not inside max-width Container so portraits can use real viewport width */}

@@ -7,35 +7,50 @@
   overflow-x: clip;
 }
 
+/* Layout only — no panel; legibility from layered shadows (cf. Shopify Editions heroes) */
+.intro {
+  width: 100%;
+  max-width: min(46rem, 100%);
+  margin-inline: auto;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+  box-sizing: border-box;
+}
+
 .label {
   margin-top: 0;
   width: 100%;
-  max-width: min(80rem, 100%);
-  margin-inline: auto;
   text-align: center;
   font-size: 0.75rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(244, 244, 248, 0.55);
-  text-shadow: 0 0 14px rgba(167, 139, 250, 0.35);
-  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.65rem;
+  -webkit-font-smoothing: antialiased;
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.95),
+    0 2px 4px rgba(0, 0, 0, 0.75),
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 8px 28px rgba(0, 0, 0, 0.4);
 }
 
 .heading {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.75rem, 4.5vw, 3rem);
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: -0.03em;
-  margin: 0 auto clamp(2rem, 5vw, 3rem);
+  margin: 0 auto;
   max-width: min(42rem, 100%);
-  color: #fafafa;
+  color: #ffffff;
   text-align: center;
+  -webkit-font-smoothing: antialiased;
   text-shadow:
-    0 0 18px rgba(0, 0, 0, 0.9),
-    0 0 36px rgba(0, 0, 0, 0.55),
-    0 0 22px rgba(167, 139, 250, 0.35),
-    0 0 48px rgba(232, 121, 249, 0.18);
+    0 1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.65),
+    0 4px 12px rgba(0, 0, 0, 0.55),
+    0 8px 28px rgba(0, 0, 0, 0.45),
+    0 16px 48px rgba(0, 0, 0, 0.35),
+    0 0 1px rgba(0, 0, 0, 0.9);
 }
 
 /* Break out of the centered column so images can span ~⅓ of the real viewport */
@@ -69,8 +84,9 @@
 
 @media (min-width: 1100px) {
   .portraits {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(1.75rem, 2.5vw, 3rem);
+    max-width: 90rem;
   }
 }
 
@@ -100,11 +116,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.65rem;
   width: 100%;
   max-width: 36rem;
   margin-inline: auto;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .name {
@@ -114,20 +131,27 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
-  color: #22d3ee;
-  text-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+  color: #7dd3fc;
   max-width: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.95),
+    0 2px 6px rgba(0, 0, 0, 0.85),
+    0 4px 16px rgba(0, 0, 0, 0.6),
+    0 0 24px rgba(0, 0, 0, 0.45);
 }
 
 .body {
   margin: 0;
-  font-size: clamp(0.88rem, 1.65vw, 1.05rem);
-  line-height: 1.55;
+  font-size: clamp(0.9rem, 1.65vw, 1.08rem);
+  line-height: 1.58;
   max-width: none;
-  color: rgba(248, 250, 252, 0.9);
+  color: rgba(255, 255, 255, 0.97);
   text-wrap: pretty;
+  -webkit-font-smoothing: antialiased;
   text-shadow:
-    0 0 12px rgba(0, 0, 0, 0.85),
-    0 0 28px rgba(0, 0, 0, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.9);
+    0 1px 1px rgba(0, 0, 0, 0.95),
+    0 2px 4px rgba(0, 0, 0, 0.82),
+    0 4px 14px rgba(0, 0, 0, 0.65),
+    0 8px 32px rgba(0, 0, 0, 0.45);
 }

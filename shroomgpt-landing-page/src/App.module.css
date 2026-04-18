@@ -68,3 +68,32 @@
   flex-direction: column;
   background: transparent;
 }
+
+/* Psychedelic plate + Historical share one grid cell; Historical stacks above (z-index). */
+.psychedelicHistoricalStack {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  isolation: isolate;
+}
+
+.psychedelicHistoricalStack > * {
+  grid-area: 1 / 1;
+  width: 100%;
+}
+
+/* Backdrop fills the full row height (row = max(image, historical)); text layer only sizes to content */
+.psychedelicHistoricalStack > :first-child {
+  z-index: 0;
+  align-self: stretch;
+}
+
+.psychedelicHistoricalStack > :last-child {
+  z-index: 1;
+  align-self: start;
+}
+
+/* When laid over the image, drop the top border seam */
+.historicalOverPsychedelic {
+  border-top: none;
+}

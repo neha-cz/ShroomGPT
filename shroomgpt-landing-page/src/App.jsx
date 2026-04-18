@@ -3,9 +3,9 @@ import { FrameCanvas } from "./components/FrameCanvas.jsx";
 import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js";
 import { HeroSection } from "./sections/HeroSection.jsx";
 import { ShroomGPTSection } from "./sections/ShroomGPTSection.jsx";
-import { ChatCtaSection } from "./sections/ChatCtaSection.jsx";
 import { CubeSection } from "./sections/CubeSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
+import { ShroomPersonSection } from "./sections/ShroomPersonSection.jsx";
 import { ThesisSection } from "./sections/ThesisSection.jsx";
 import { WaitlistSection } from "./sections/WaitlistSection.jsx";
 import styles from "./App.module.css";
@@ -122,8 +122,10 @@ export default function App() {
           <>
             <ShroomGPTSection />
             <CubeSection ref={cinematicSpacerRef} />
-            <ChatCtaSection />
-            <HistoricalSection />
+            <div className={styles.psychedelicHistoricalStack}>
+              <ShroomPersonSection />
+              <HistoricalSection className={styles.historicalOverPsychedelic} />
+            </div>
             <ThesisSection />
             <WaitlistSection />
           </>
