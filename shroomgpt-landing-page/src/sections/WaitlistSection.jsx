@@ -18,7 +18,7 @@ const WAITLIST_FOOTER =
 const MotionButton = motion(Button);
 const MotionInput = motion(Input);
 
-export function WaitlistSection() {
+export function WaitlistSection({ className } = {}) {
   const reduce = useReducedMotion();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
@@ -32,7 +32,7 @@ export function WaitlistSection() {
   return (
     <section
       id="waitlist"
-      className={styles.section}
+      className={[styles.section, className].filter(Boolean).join(" ")}
       aria-labelledby="waitlist-heading"
     >
       <Container className={styles.inner}>

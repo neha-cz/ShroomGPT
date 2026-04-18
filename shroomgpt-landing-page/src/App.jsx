@@ -124,10 +124,12 @@ export default function App() {
             <CubeSection ref={cinematicSpacerRef} />
             <div className={styles.psychedelicHistoricalStack}>
               <ShroomPersonSection />
-              <HistoricalSection className={styles.historicalOverPsychedelic} />
+              <div className={styles.psychedelicContent}>
+                <HistoricalSection className={styles.historicalOverPsychedelic} />
+                <ThesisSection className={styles.thesisOverPsychedelic} />
+                <WaitlistSection className={styles.waitlistOverPsychedelic} />
+              </div>
             </div>
-            <ThesisSection />
-            <WaitlistSection />
           </>
         ) : null}
       </main>

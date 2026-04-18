@@ -69,7 +69,7 @@
   background: transparent;
 }
 
-/* Psychedelic plate + Historical share one grid cell; Historical stacks above (z-index). */
+/* Psychedelic plate + content column share one grid cell; content stacks above (z-index). */
 .psychedelicHistoricalStack {
   position: relative;
   display: grid;
@@ -82,18 +82,41 @@
   width: 100%;
 }
 
-/* Backdrop fills the full row height (row = max(image, historical)); text layer only sizes to content */
+/* Backdrop fills the full row height; content column only sizes to its children */
 .psychedelicHistoricalStack > :first-child {
   z-index: 0;
   align-self: stretch;
 }
 
-.psychedelicHistoricalStack > :last-child {
+.psychedelicContent {
+  position: relative;
   z-index: 1;
   align-self: start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* When laid over the image, drop the top border seam */
+/* When laid over the image, drop top border seams */
 .historicalOverPsychedelic {
   border-top: none;
+}
+
+/* Stack flush under Historical: drop full-viewport centering + extra top air */
+.psychedelicContent .thesisOverPsychedelic {
+  min-height: unset;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-block: clamp(0.75rem, 2.5vh, 1.75rem) clamp(2.5rem, 8vh, 4.5rem);
+}
+
+.psychedelicContent .waitlistOverPsychedelic {
+  border-top: none;
+  min-height: unset;
+  justify-content: flex-start;
+  padding-block: clamp(1.5rem, 4vh, 2.75rem) clamp(2.5rem, 9vh, 4.5rem);
+}
+
+.psychedelicContent .waitlistOverPsychedelic footer {
+  margin-top: clamp(2rem, 5vh, 3rem);
 }

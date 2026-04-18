@@ -2,7 +2,10 @@ import { useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./ShroomPersonSection.module.css";
 
-const IMG_SRC = "/new-psychedelic-person.png";
+const IMG_SRC = "/cropped-pinterest.png";
+
+/** Veil reaches 0 after this many viewport heights of scroll (not full section height). */
+const FADE_SCROLL_VH = 1.42;
 
 /**
  * Psychedelic plate + scroll-scrubbed black veil (inverse of ShroomGPT→Cube:
@@ -20,9 +23,7 @@ export function ShroomPersonSection() {
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight || 1;
-    const h = rect.height || 1;
-    /* Progress 0 → 1 as the block moves through the viewport (top entering → bottom leaving) */
-    const scrollable = h + vh;
+    const scrollable = vh * FADE_SCROLL_VH;
     const scrolled = vh - rect.top;
     const progress = Math.min(1, Math.max(0, scrolled / scrollable));
     setVeilOpacity(1 - progress);
@@ -53,8 +54,8 @@ export function ShroomPersonSection() {
           className={styles.bgImg}
           src={IMG_SRC}
           alt=""
-          width={1626}
-          height={842}
+          width={760}
+          height={1366}
           decoding="async"
           draggable={false}
         />

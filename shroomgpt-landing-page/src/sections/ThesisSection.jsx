@@ -22,11 +22,14 @@ const BODY =
 
 const THESIS_HEADLINE = HEADLINE_WORDS.join(" ");
 
-export function ThesisSection() {
+export function ThesisSection({ className } = {}) {
   const reduce = useReducedMotion();
 
   return (
-    <section className={styles.section} aria-labelledby="thesis-heading">
+    <section
+      className={[styles.section, className].filter(Boolean).join(" ")}
+      aria-labelledby="thesis-heading"
+    >
       <Container className={styles.inner}>
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
