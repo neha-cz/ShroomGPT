@@ -4,7 +4,6 @@ import styles from "./CubeSection.module.css";
 
 const FRAME_COUNT = 42;
 const FILM_PATH = "/shroom-llm-cube";
-/** Scroll delta (wheel or touch) accumulated before advancing one frame */
 const FRAME_STEP_PX = 95;
 
 function frameUrl(index) {
@@ -18,44 +17,14 @@ function getLockScrollY(sectionEl) {
   return rect.top + window.scrollY;
 }
 
-/** Scroll position encoded in `body.style.top` while fixed (e.g. `-512px` → 512) */
-function readScrollYFromFixedBody() {
-  const top = document.body.style.top;
-  if (!top || top === "0px") return null;
-  const n = parseInt(top, 10);
-  return Number.isNaN(n) ? null : Math.abs(n);
-}
-
-function applyBodyLock(scrollY) {
-  document.documentElement.style.overflow = "hidden";
-  document.body.style.overflow = "hidden";
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-}
-
-function clearBodyLock() {
-  document.documentElement.style.overflow = "";
-  document.body.style.overflow = "";
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-}
-
 /**
- * Plain black cube strip. On approach: page locks; wheel/touch advance frames;
- * at end (or scroll up from frame 0): unlock and resume normal scroll.
- * Ref shared with App for cinematic backdrop fade.
+ * Scroll-pinned cube (no `position: fixed` on body — avoids cross-browser unlock glitches).
+ * While locked: wheel/touch advance frames; document scroll is held at `savedScrollYRef`.
  */
 export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef) {
   const reduce = useReducedMotion();
   const sectionRef = useRef(null);
   const [frameIndex, setFrameIndex] = useState(0);
-  /** before_lock | locked | after_unlock */
   const [phase, setPhase] = useState("before_lock");
   const savedScrollYRef = useRef(0);
   const lockYRef = useRef(0);
@@ -63,7 +32,6 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
   const frameRef = useRef(0);
   const phaseRef = useRef("before_lock");
   const touchLastY = useRef(null);
-  /** Ignore global scroll handler briefly after programmatic unlock to avoid fighting layout */
   const ignoreScrollRef = useRef(false);
 
   const setSectionRef = useCallback(
@@ -95,11 +63,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
 
   const releaseLockForward = useCallback(
     (momentumDelta = 0) => {
-      const y = readScrollYFromFixedBody() ?? savedScrollYRef.current;
-      clearBodyLock();
-      /* Two-arg scroll is immediate (no smooth scroll) on all browsers */
-      window.scrollTo(0, y);
-
+      const anchor = savedScrollYRef.current;
       phaseRef.current = "after_unlock";
       setPhase("after_unlock");
       frameRef.current = FRAME_COUNT - 1;
@@ -109,25 +73,21 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       ignoreScrollRef.current = true;
       window.setTimeout(() => {
         ignoreScrollRef.current = false;
-      }, 240);
+      }, 320);
 
-      /* Re-apply the wheel/trackpad delta as real scroll so the gesture continues naturally */
-      requestAnimationFrame(() => {
-        if (momentumDelta > 0) {
-          window.scrollBy(0, momentumDelta);
-        }
-        syncLockY();
-      });
+      /* Stay at anchor, then apply the same wheel delta as normal scrolling */
+      window.scrollTo(0, anchor);
+      if (momentumDelta > 0) {
+        window.scrollBy(0, momentumDelta);
+      }
+      syncLockY();
     },
     [syncLockY]
   );
 
   const releaseLockBackward = useCallback(
     (momentumDelta = 0) => {
-      const y = readScrollYFromFixedBody() ?? savedScrollYRef.current;
-      clearBodyLock();
-      window.scrollTo(0, y);
-
+      const anchor = savedScrollYRef.current;
       phaseRef.current = "before_lock";
       setPhase("before_lock");
       frameRef.current = 0;
@@ -137,26 +97,25 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       ignoreScrollRef.current = true;
       window.setTimeout(() => {
         ignoreScrollRef.current = false;
-      }, 240);
+      }, 320);
 
-      requestAnimationFrame(() => {
-        if (momentumDelta < 0) {
-          window.scrollBy(0, momentumDelta);
-        } else {
-          window.scrollBy(0, -2);
-        }
-        syncLockY();
-      });
+      window.scrollTo(0, anchor);
+      if (momentumDelta < 0) {
+        window.scrollBy(0, momentumDelta);
+      } else {
+        window.scrollBy(0, -2);
+      }
+      syncLockY();
     },
     [syncLockY]
   );
 
   const engageLock = useCallback(() => {
     if (reduce || phaseRef.current !== "before_lock") return;
-    phaseRef.current = "locked";
     const y = lockYRef.current;
     savedScrollYRef.current = y;
-    applyBodyLock(y);
+    window.scrollTo(0, y);
+    phaseRef.current = "locked";
     setPhase("locked");
     frameRef.current = 0;
     setFrameIndex(0);
@@ -205,6 +164,15 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       if (ignoreScrollRef.current) return;
 
       const ph = phaseRef.current;
+
+      if (ph === "locked") {
+        const pin = savedScrollYRef.current;
+        if (Math.abs(window.scrollY - pin) > 0.5) {
+          window.scrollTo(0, pin);
+        }
+        return;
+      }
+
       syncLockY();
       const lockY = lockYRef.current;
 
@@ -269,16 +237,6 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       window.removeEventListener("touchend", onTouchEnd, { capture: true });
     };
   }, [reduce, phase, applyScrollDelta]);
-
-  useEffect(() => {
-    return () => {
-      if (phaseRef.current === "locked") {
-        const y = readScrollYFromFixedBody() ?? savedScrollYRef.current;
-        clearBodyLock();
-        window.scrollTo(0, y);
-      }
-    };
-  }, []);
 
   return (
     <section
