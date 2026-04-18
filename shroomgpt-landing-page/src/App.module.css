@@ -61,17 +61,6 @@
   pointer-events: none;
 }
 
-/**
- * Scroll runway between ShroomGPT and Historical — drives the overlay ↔ cinematic
- * backdrop cross-fade (same idea as `.heroSpacer` for the hero).
- */
-.cinematicSpacer {
-  flex-shrink: 0;
-  width: 100%;
-  height: 400vh;
-  pointer-events: none;
-}
-
 .main {
   position: relative;
   z-index: 2;

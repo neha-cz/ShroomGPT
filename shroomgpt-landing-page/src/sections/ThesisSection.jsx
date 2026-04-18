@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "../components/uimax/Container.jsx";
-import { WarpText } from "../components/warp/index.js";
 import styles from "./ThesisSection.module.css";
 
 const HEADLINE_WORDS = [
@@ -38,12 +37,7 @@ export function ThesisSection() {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <WarpText
-            text="03 / THE NEXT FRONTIER"
-            className={styles.label}
-            typographyClassName={styles.label}
-            align="center"
-          />
+          <p className={styles.label}>03 / THE NEXT FRONTIER</p>
 
           <motion.h2
             id="thesis-heading"
@@ -57,14 +51,7 @@ export function ThesisSection() {
               ease: [0.16, 1, 0.3, 1],
             }}
           >
-            <WarpText
-              text={THESIS_HEADLINE}
-              className={styles.headline}
-              typographyClassName={styles.headline}
-              align="center"
-              ariaHidden
-              fallbackAs="span"
-            />
+            <span className={styles.headline}>{THESIS_HEADLINE}</span>
           </motion.h2>
 
           <motion.div
@@ -77,12 +64,7 @@ export function ThesisSection() {
               ease: [0.16, 1, 0.3, 1],
             }}
           >
-            <WarpText
-              text={BODY}
-              className={styles.body}
-              typographyClassName={styles.body}
-              align="center"
-            />
+            <p className={styles.body}>{BODY}</p>
           </motion.div>
         </motion.div>
       </Container>

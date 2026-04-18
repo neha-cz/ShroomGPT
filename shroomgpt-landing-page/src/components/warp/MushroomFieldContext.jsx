@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { bindMushroomStoreToWindow, startMushroomStoreLoop } from "./mushroomStore.js";
 
-/** Starts global pointer smoothing + scroll tracking for warp text and the mushroom icon. */
+/** Starts global pointer smoothing for the mushroom cursor (CSS vars). */
 export function MushroomFieldProvider({ children }) {
   useEffect(() => {
     startMushroomStoreLoop();

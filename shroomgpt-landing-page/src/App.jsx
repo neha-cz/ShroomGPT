@@ -3,6 +3,7 @@ import { FrameCanvas } from "./components/FrameCanvas.jsx";
 import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js";
 import { HeroSection } from "./sections/HeroSection.jsx";
 import { ShroomGPTSection } from "./sections/ShroomGPTSection.jsx";
+import { CubeSection } from "./sections/CubeSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
 import { ThesisSection } from "./sections/ThesisSection.jsx";
 import { WaitlistSection } from "./sections/WaitlistSection.jsx";
@@ -119,11 +120,7 @@ export default function App() {
         {sectionsUnlocked ? (
           <>
             <ShroomGPTSection />
-            <div
-              ref={cinematicSpacerRef}
-              className={styles.cinematicSpacer}
-              aria-hidden="true"
-            />
+            <CubeSection ref={cinematicSpacerRef} />
             <HistoricalSection />
             <ThesisSection />
             <WaitlistSection />

@@ -17,6 +17,7 @@
 }
 
 .label {
+  margin-top: 0;
   font-size: 0.75rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;

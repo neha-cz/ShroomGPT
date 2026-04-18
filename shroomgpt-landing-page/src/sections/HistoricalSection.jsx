@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "../components/uimax/Container.jsx";
-import { WarpText } from "../components/warp/index.js";
 import styles from "./HistoricalSection.module.css";
 
 const HISTORICAL_HEADING =
@@ -36,25 +35,13 @@ export function HistoricalSection() {
   return (
     <section className={styles.section} aria-labelledby="historical-heading">
       <Container wide>
-        <WarpText
-          text="02 / THE PRECEDENT"
-          className={styles.label}
-          typographyClassName={styles.label}
-          align="center"
-        />
+        <p className={styles.label}>02 / THE PRECEDENT</p>
         <h2
           id="historical-heading"
           aria-label={HISTORICAL_HEADING}
           style={{ margin: 0 }}
         >
-          <WarpText
-            text={HISTORICAL_HEADING}
-            className={styles.heading}
-            typographyClassName={styles.heading}
-            align="center"
-            ariaHidden
-            fallbackAs="span"
-          />
+          <span className={styles.heading}>{HISTORICAL_HEADING}</span>
         </h2>
       </Container>
 
@@ -88,23 +75,9 @@ export function HistoricalSection() {
               </div>
               <div className={styles.caption}>
                 <h3 aria-label={s.name} style={{ margin: 0 }}>
-                  <WarpText
-                    text={s.name}
-                    className={styles.name}
-                    typographyClassName={styles.name}
-                    align="center"
-                    ariaHidden
-                    fallbackAs="span"
-                  />
+                  <span className={styles.name}>{s.name}</span>
                 </h3>
-                <div className={styles.body}>
-                  <WarpText
-                    text={s.body}
-                    className={styles.body}
-                    typographyClassName={styles.body}
-                    align="center"
-                  />
-                </div>
+                <p className={styles.body}>{s.body}</p>
               </div>
             </motion.article>
           ))}

@@ -1,0 +1,29 @@
+.section {
+  position: relative;
+  background: #000;
+  /* One viewport tall; scroll runway removed — wheel drives frames while locked */
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(1.5rem, 4vh, 3rem) clamp(1rem, 3vw, 2rem);
+}
+
+.frameWrap {
+  width: min(92vw, 960px);
+}
+
+.frame {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+

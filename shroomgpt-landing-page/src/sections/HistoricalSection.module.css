@@ -8,6 +8,7 @@
 }
 
 .label {
+  margin-top: 0;
   width: 100%;
   max-width: min(80rem, 100%);
   margin-inline: auto;

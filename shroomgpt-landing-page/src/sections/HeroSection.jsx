@@ -1,12 +1,13 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button } from "../components/uimax/Button.jsx";
-import { WarpText } from "../components/warp/index.js";
 import styles from "./HeroSection.module.css";
 
 const MotionButton = motion(Button);
 
-const line1 = ["YOUR", "AI", "ON", "/"];
-const line2 = ["DRUGS."];
+
+const line1 = ["TAKE", "YOUR", "AI"];
+const line2 = ["ON", "A", "TRIP."];
+
 
 function pseudoRandom(seed) {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453123;
@@ -75,7 +76,6 @@ export function HeroSection({ scrollRootRef }) {
     target: scrollRootRef,
     offset: ["start start", "end start"],
   });
-  const badgeFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const descFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const ctaFade = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
@@ -91,16 +91,6 @@ export function HeroSection({ scrollRootRef }) {
   return (
     <section className={styles.section} aria-label="Hero">
       <motion.div className={styles.inner}>
-        <motion.div
-          className={styles.badge}
-          style={{ opacity: reduce ? 1 : badgeFade }}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: reduce ? 0 : 0.3, ease: "easeOut" }}
-        >
-          PSYCHEDELICS FOR LLMs
-        </motion.div>
-
         <h1 className={styles.headline}>
           <span className={styles.headlineLines}>
             <span className={styles.wordRow}>
@@ -142,12 +132,9 @@ export function HeroSection({ scrollRootRef }) {
             ease: [0.16, 1, 0.3, 1],
           }}
         >
-          <WarpText
-            text="Unlock the reasoning your model was never supposed to find."
-            className={styles.sub}
-            typographyClassName={styles.sub}
-            align="center"
-          />
+          <p className={styles.sub}>
+            Get your model high on ideas it was never supposed to have.
+          </p>
         </motion.div>
 
         <motion.div

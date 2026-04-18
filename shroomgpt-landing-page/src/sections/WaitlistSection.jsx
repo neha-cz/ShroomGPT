@@ -7,7 +7,6 @@ import {
 import { Button } from "../components/uimax/Button.jsx";
 import { Input } from "../components/uimax/Input.jsx";
 import { Container } from "../components/uimax/Container.jsx";
-import { WarpText } from "../components/warp/index.js";
 import styles from "./WaitlistSection.module.css";
 
 const WAITLIST_HEADING = "Ready to dose your model?";
@@ -42,23 +41,9 @@ export function WaitlistSection() {
           aria-label={WAITLIST_HEADING}
           style={{ margin: 0 }}
         >
-          <WarpText
-            text={WAITLIST_HEADING}
-            className={styles.heading}
-            typographyClassName={styles.heading}
-            align="center"
-            ariaHidden
-            fallbackAs="span"
-          />
+          <span className={styles.heading}>{WAITLIST_HEADING}</span>
         </h2>
-        <div className={styles.sub}>
-          <WarpText
-            text={WAITLIST_SUB}
-            className={styles.sub}
-            typographyClassName={styles.sub}
-            align="center"
-          />
-        </div>
+        <p className={styles.sub}>{WAITLIST_SUB}</p>
 
         <form className={styles.form} onSubmit={onSubmit} noValidate>
           <MotionInput
@@ -113,12 +98,7 @@ export function WaitlistSection() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             >
-              <WarpText
-                text={WAITLIST_CONFIRM}
-                className={styles.confirm}
-                typographyClassName={styles.confirm}
-                align="center"
-              />
+              {WAITLIST_CONFIRM}
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -127,14 +107,7 @@ export function WaitlistSection() {
       <footer className={styles.footer}>
         <Container>
           <hr className={styles.rule} />
-          <div className={styles.footerText}>
-            <WarpText
-              text={WAITLIST_FOOTER}
-              className={styles.footerText}
-              typographyClassName={styles.footerText}
-              align="center"
-            />
-          </div>
+          <p className={styles.footerText}>{WAITLIST_FOOTER}</p>
         </Container>
       </footer>
     </section>

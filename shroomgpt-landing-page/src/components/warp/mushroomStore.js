@@ -1,11 +1,10 @@
-/** Smoothed pointer + scroll, read by warp canvases each frame (no React churn). */
+/** Smoothed pointer for the mushroom cursor (CSS vars). */
 
 export const mushroomStore = {
   clientX:
     typeof window !== "undefined" ? Math.floor(window.innerWidth / 2) : 0,
   clientY:
     typeof window !== "undefined" ? Math.floor(window.innerHeight / 2) : 0,
-  scrollY: typeof window !== "undefined" ? window.scrollY : 0,
 };
 
 const SMOOTH = 0.12;
@@ -42,15 +41,9 @@ export function bindMushroomStoreToWindow() {
     target.x = e.clientX;
     target.y = e.clientY;
   };
-  const onScroll = () => {
-    mushroomStore.scrollY = window.scrollY;
-  };
   window.addEventListener("pointermove", onPointer, { passive: true });
-  window.addEventListener("scroll", onScroll, { passive: true });
-  mushroomStore.scrollY = window.scrollY;
   syncCssVars();
   return () => {
     window.removeEventListener("pointermove", onPointer);
-    window.removeEventListener("scroll", onScroll);
   };
 }
