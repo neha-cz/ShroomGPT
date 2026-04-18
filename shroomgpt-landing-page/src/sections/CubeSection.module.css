@@ -4,12 +4,13 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+  /* Shared horizontal inset for title, Spline, and body (nudged right vs ShroomGPT copy) */
+  --cube-inset-left: clamp(3.5rem, 10.5vw, 6.25rem);
 }
 
 /* Matches ShroomGPTSection `.subtitle` — gradient display text */
 .sectionIntro {
-  padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0
-    clamp(3rem, 9.5vw, 5.75rem);
+  padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0 var(--cube-inset-left);
   text-align: left;
 }
 
@@ -37,11 +38,12 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: clamp(0.5rem, 1.25vw, 0.85rem);
   margin-top: clamp(1.35rem, 3.5vh, 2.75rem);
-  padding: 0 0 clamp(1.5rem, 4vh, 2.5rem);
+  padding: 0 clamp(1rem, 3vw, 2rem) clamp(1.5rem, 4vh, 2.5rem);
+  padding-left: var(--cube-inset-left);
   box-sizing: border-box;
 }
 
@@ -50,7 +52,6 @@
   width: min(76vw, 880px);
   height: min(62vh, 520px);
   max-width: 100%;
-  margin: 0 auto;
   overflow: hidden;
   background: #000;
 }
@@ -69,8 +70,7 @@
   align-self: stretch;
   width: 100%;
   margin-top: 0;
-  padding: 0 clamp(1rem, 3vw, 2rem) 0;
-  padding-left: clamp(3rem, 9.5vw, 5.75rem);
+  padding: 0;
   text-align: left;
 }
 
