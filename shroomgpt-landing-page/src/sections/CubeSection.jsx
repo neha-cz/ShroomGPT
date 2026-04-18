@@ -3,10 +3,10 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { CubeFilmBuffer } from "../components/CubeFilmBuffer.jsx";
 import styles from "./CubeSection.module.css";
 
-const FRAME_COUNT = 42;
-const FILM_PATH = "/shroom-llm-cube";
+const FRAME_COUNT = 240;
+const FILM_PATH = "/shroom-llm-cube-fixed";
 /** Scroll pixels per frame — higher = slower scrub (same smooth float→round mapping) */
-const PIXELS_PER_FRAME = 20;
+const PIXELS_PER_FRAME = 7;
 
 function getLockScrollY(sectionEl) {
   if (!sectionEl) return 0;
