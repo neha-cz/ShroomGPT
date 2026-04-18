@@ -1,15 +1,12 @@
 import { useReducedMotion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { CubeFilmBuffer } from "../components/CubeFilmBuffer.jsx";
 import styles from "./CubeSection.module.css";
 
 const FRAME_COUNT = 42;
 const FILM_PATH = "/shroom-llm-cube";
-const FRAME_STEP_PX = 95;
-
-function frameUrl(index) {
-  const n = String(Math.min(FRAME_COUNT, Math.max(1, index + 1))).padStart(3, "0");
-  return `${FILM_PATH}/ezgif-frame-${n}.jpg`;
-}
+/** Smaller step = finer scrub; paired with batched React updates + double-buffer swap */
+const FRAME_STEP_PX = 48;
 
 function getLockScrollY(sectionEl) {
   if (!sectionEl) return 0;
@@ -33,6 +30,8 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
   const phaseRef = useRef("before_lock");
   const touchLastY = useRef(null);
   const ignoreScrollRef = useRef(false);
+  const wheelPendingRef = useRef(0);
+  const wheelRafRef = useRef(0);
 
   const setSectionRef = useCallback(
     (node) => {
@@ -122,6 +121,11 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     accumRef.current = 0;
   }, [reduce]);
 
+  const getFrameUrl = useCallback((index) => {
+    const n = String(Math.min(FRAME_COUNT, Math.max(1, index + 1))).padStart(3, "0");
+    return `${FILM_PATH}/ezgif-frame-${n}.jpg`;
+  }, []);
+
   const applyScrollDelta = useCallback(
     (delta) => {
       if (phaseRef.current !== "locked") return;
@@ -136,20 +140,30 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       }
 
       accumRef.current += delta;
+      const start = frameRef.current;
 
       while (accumRef.current >= FRAME_STEP_PX && frameRef.current < FRAME_COUNT - 1) {
         accumRef.current -= FRAME_STEP_PX;
         frameRef.current += 1;
-        setFrameIndex(frameRef.current);
       }
       while (accumRef.current <= -FRAME_STEP_PX && frameRef.current > 0) {
         accumRef.current += FRAME_STEP_PX;
         frameRef.current -= 1;
+      }
+
+      if (frameRef.current !== start) {
         setFrameIndex(frameRef.current);
       }
     },
     [releaseLockForward, releaseLockBackward]
   );
+
+  const flushWheel = useCallback(() => {
+    wheelRafRef.current = 0;
+    const d = wheelPendingRef.current;
+    wheelPendingRef.current = 0;
+    if (d !== 0) applyScrollDelta(d);
+  }, [applyScrollDelta]);
 
   useEffect(() => {
     if (reduce) {
@@ -203,12 +217,22 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     const onWheel = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      applyScrollDelta(e.deltaY);
+      wheelPendingRef.current += e.deltaY;
+      if (!wheelRafRef.current) {
+        wheelRafRef.current = requestAnimationFrame(flushWheel);
+      }
     };
 
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
-    return () => window.removeEventListener("wheel", onWheel, { capture: true });
-  }, [reduce, phase, applyScrollDelta]);
+    return () => {
+      window.removeEventListener("wheel", onWheel, { capture: true });
+      if (wheelRafRef.current) {
+        cancelAnimationFrame(wheelRafRef.current);
+        wheelRafRef.current = 0;
+      }
+      wheelPendingRef.current = 0;
+    };
+  }, [reduce, phase, flushWheel]);
 
   useEffect(() => {
     if (reduce || phase !== "locked") return;
@@ -246,15 +270,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     >
       <div className={styles.sticky}>
         <div className={styles.frameWrap}>
-          <img
-            src={frameUrl(frameIndex)}
-            alt=""
-            className={styles.frame}
-            width={1280}
-            height={720}
-            decoding="async"
-            draggable={false}
-          />
+          <CubeFilmBuffer frameIndex={frameIndex} getFrameUrl={getFrameUrl} />
         </div>
       </div>
     </section>

@@ -1,7 +1,6 @@
 .section {
   position: relative;
   background: #000;
-  /* One viewport tall; scroll runway removed — wheel drives frames while locked */
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -18,12 +17,35 @@
 }
 
 .frameWrap {
+  position: relative;
   width: min(92vw, 960px);
+  contain: layout style paint;
 }
 
-.frame {
+/* Double-buffer: decode hidden layer, then swap — avoids white flash between JPEGs */
+.layer {
   width: 100%;
   height: auto;
   display: block;
+  transition: none;
+  will-change: opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
+.layerOn {
+  opacity: 1;
+  z-index: 2;
+  position: relative;
+}
+
+.layerOff {
+  opacity: 0;
+  z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+}
