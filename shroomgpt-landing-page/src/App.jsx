@@ -3,6 +3,7 @@ import { FrameCanvas } from "./components/FrameCanvas.jsx";
 import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js";
 import { HeroSection } from "./sections/HeroSection.jsx";
 import { ShroomGPTSection } from "./sections/ShroomGPTSection.jsx";
+import { ChatCtaSection } from "./sections/ChatCtaSection.jsx";
 import { CubeSection } from "./sections/CubeSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
 import { ThesisSection } from "./sections/ThesisSection.jsx";
@@ -121,6 +122,7 @@ export default function App() {
           <>
             <ShroomGPTSection />
             <CubeSection ref={cinematicSpacerRef} />
+            <ChatCtaSection />
             <HistoricalSection />
             <ThesisSection />
             <WaitlistSection />
