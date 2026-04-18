@@ -5,8 +5,8 @@ import styles from "./CubeSection.module.css";
 
 const FRAME_COUNT = 42;
 const FILM_PATH = "/shroom-llm-cube";
-/** Smaller step = finer scrub; paired with batched React updates + double-buffer swap */
-const FRAME_STEP_PX = 48;
+/** Scroll pixels per frame of film — lower = smoother / finer scrub */
+const PIXELS_PER_FRAME = 22;
 
 function getLockScrollY(sectionEl) {
   if (!sectionEl) return 0;
@@ -25,13 +25,14 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
   const [phase, setPhase] = useState("before_lock");
   const savedScrollYRef = useRef(0);
   const lockYRef = useRef(0);
-  const accumRef = useRef(0);
+  /** Continuous film position (0 … FRAME_COUNT-1); maps smoothly from scroll delta */
+  const filmPositionRef = useRef(0);
   const frameRef = useRef(0);
   const phaseRef = useRef("before_lock");
   const touchLastY = useRef(null);
   const ignoreScrollRef = useRef(false);
-  const wheelPendingRef = useRef(0);
-  const wheelRafRef = useRef(0);
+  const inputPendingRef = useRef(0);
+  const inputRafRef = useRef(0);
 
   const setSectionRef = useCallback(
     (node) => {
@@ -66,8 +67,8 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       phaseRef.current = "after_unlock";
       setPhase("after_unlock");
       frameRef.current = FRAME_COUNT - 1;
+      filmPositionRef.current = FRAME_COUNT - 1;
       setFrameIndex(FRAME_COUNT - 1);
-      accumRef.current = 0;
 
       ignoreScrollRef.current = true;
       window.setTimeout(() => {
@@ -90,8 +91,8 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       phaseRef.current = "before_lock";
       setPhase("before_lock");
       frameRef.current = 0;
+      filmPositionRef.current = 0;
       setFrameIndex(0);
-      accumRef.current = 0;
 
       ignoreScrollRef.current = true;
       window.setTimeout(() => {
@@ -117,8 +118,8 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     phaseRef.current = "locked";
     setPhase("locked");
     frameRef.current = 0;
+    filmPositionRef.current = 0;
     setFrameIndex(0);
-    accumRef.current = 0;
   }, [reduce]);
 
   const getFrameUrl = useCallback((index) => {
@@ -126,9 +127,9 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     return `${FILM_PATH}/ezgif-frame-${n}.jpg`;
   }, []);
 
-  const applyScrollDelta = useCallback(
+  const applyFilmDelta = useCallback(
     (delta) => {
-      if (phaseRef.current !== "locked") return;
+      if (phaseRef.current !== "locked" || delta === 0) return;
 
       if (frameRef.current >= FRAME_COUNT - 1 && delta > 0) {
         releaseLockForward(delta);
@@ -139,31 +140,35 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
         return;
       }
 
-      accumRef.current += delta;
-      const start = frameRef.current;
+      const max = FRAME_COUNT - 1;
+      filmPositionRef.current = Math.max(
+        0,
+        Math.min(max, filmPositionRef.current + delta / PIXELS_PER_FRAME)
+      );
 
-      while (accumRef.current >= FRAME_STEP_PX && frameRef.current < FRAME_COUNT - 1) {
-        accumRef.current -= FRAME_STEP_PX;
-        frameRef.current += 1;
-      }
-      while (accumRef.current <= -FRAME_STEP_PX && frameRef.current > 0) {
-        accumRef.current += FRAME_STEP_PX;
-        frameRef.current -= 1;
-      }
-
-      if (frameRef.current !== start) {
-        setFrameIndex(frameRef.current);
+      const next = Math.min(max, Math.max(0, Math.round(filmPositionRef.current)));
+      if (next !== frameRef.current) {
+        frameRef.current = next;
+        filmPositionRef.current = next;
+        setFrameIndex(next);
       }
     },
     [releaseLockForward, releaseLockBackward]
   );
 
-  const flushWheel = useCallback(() => {
-    wheelRafRef.current = 0;
-    const d = wheelPendingRef.current;
-    wheelPendingRef.current = 0;
-    if (d !== 0) applyScrollDelta(d);
-  }, [applyScrollDelta]);
+  const flushInput = useCallback(() => {
+    inputRafRef.current = 0;
+    const d = inputPendingRef.current;
+    inputPendingRef.current = 0;
+    if (d !== 0) applyFilmDelta(d);
+  }, [applyFilmDelta]);
+
+  const scheduleFilmInput = useCallback((delta) => {
+    inputPendingRef.current += delta;
+    if (!inputRafRef.current) {
+      inputRafRef.current = requestAnimationFrame(flushInput);
+    }
+  }, [flushInput]);
 
   useEffect(() => {
     if (reduce) {
@@ -171,6 +176,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       setPhase("after_unlock");
       setFrameIndex(FRAME_COUNT - 1);
       frameRef.current = FRAME_COUNT - 1;
+      filmPositionRef.current = FRAME_COUNT - 1;
       return;
     }
 
@@ -196,6 +202,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
           setPhase("before_lock");
           setFrameIndex(0);
           frameRef.current = 0;
+          filmPositionRef.current = 0;
         }
         return;
       }
@@ -217,22 +224,19 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     const onWheel = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      wheelPendingRef.current += e.deltaY;
-      if (!wheelRafRef.current) {
-        wheelRafRef.current = requestAnimationFrame(flushWheel);
-      }
+      scheduleFilmInput(e.deltaY);
     };
 
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
     return () => {
       window.removeEventListener("wheel", onWheel, { capture: true });
-      if (wheelRafRef.current) {
-        cancelAnimationFrame(wheelRafRef.current);
-        wheelRafRef.current = 0;
+      if (inputRafRef.current) {
+        cancelAnimationFrame(inputRafRef.current);
+        inputRafRef.current = 0;
       }
-      wheelPendingRef.current = 0;
+      inputPendingRef.current = 0;
     };
-  }, [reduce, phase, flushWheel]);
+  }, [reduce, phase, scheduleFilmInput]);
 
   useEffect(() => {
     if (reduce || phase !== "locked") return;
@@ -246,7 +250,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       const y = e.touches[0].clientY;
       const delta = touchLastY.current - y;
       touchLastY.current = y;
-      applyScrollDelta(delta * 1.4);
+      scheduleFilmInput(delta * 1.35);
     };
     const onTouchEnd = () => {
       touchLastY.current = null;
@@ -260,7 +264,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
       window.removeEventListener("touchmove", onTouchMove, { capture: true });
       window.removeEventListener("touchend", onTouchEnd, { capture: true });
     };
-  }, [reduce, phase, applyScrollDelta]);
+  }, [reduce, phase, scheduleFilmInput]);
 
   return (
     <section

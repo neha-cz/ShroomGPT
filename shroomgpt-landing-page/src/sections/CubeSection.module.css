@@ -1,6 +1,7 @@
 .section {
   position: relative;
   background: #000;
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -8,24 +9,34 @@
 .sticky {
   position: sticky;
   top: 0;
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: clamp(1.5rem, 4vh, 3rem) clamp(1rem, 3vw, 2rem);
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .frameWrap {
   position: relative;
-  width: min(92vw, 960px);
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100%;
+  overflow: hidden;
   contain: layout style paint;
 }
 
 /* Double-buffer: decode hidden layer, then swap — avoids white flash between JPEGs */
 .layer {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
   transition: none;
   will-change: opacity;
@@ -37,15 +48,10 @@
 .layerOn {
   opacity: 1;
   z-index: 2;
-  position: relative;
 }
 
 .layerOff {
   opacity: 0;
   z-index: 1;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
   pointer-events: none;
 }
