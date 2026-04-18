@@ -5,8 +5,8 @@ import styles from "./CubeSection.module.css";
 
 const FRAME_COUNT = 42;
 const FILM_PATH = "/shroom-llm-cube";
-/** Scroll pixels per frame of film — lower = smoother / finer scrub */
-const PIXELS_PER_FRAME = 22;
+/** Scroll pixels per frame — higher = slower scrub (same smooth float→round mapping) */
+const PIXELS_PER_FRAME = 20;
 
 function getLockScrollY(sectionEl) {
   if (!sectionEl) return 0;
@@ -270,12 +270,28 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     <section
       ref={setSectionRef}
       className={styles.section}
-      aria-label="Shroom LLM cube sequence"
+      aria-labelledby="cube-section-heading"
     >
+      <div className={styles.sectionIntro}>
+        <h2 id="cube-section-heading" className={styles.subtitle}>
+          Transforming the LLM architecture
+        </h2>
+      </div>
       <div className={styles.sticky}>
         <div className={styles.frameWrap}>
           <CubeFilmBuffer frameIndex={frameIndex} getFrameUrl={getFrameUrl} />
         </div>
+      </div>
+      <div className={styles.copyBelow}>
+        <p className={styles.lede}>
+          Altered-state effects are translated into structured perturbations and injected into the
+          model&apos;s internal activations during inference. As each distorted signal propagates
+          through the remaining layers, it{" "}
+          <strong className={styles.ledeEmphasis}>
+            compounds across every token generated
+          </strong>
+          , producing genuine shifts in reasoning.
+        </p>
       </div>
     </section>
   );
