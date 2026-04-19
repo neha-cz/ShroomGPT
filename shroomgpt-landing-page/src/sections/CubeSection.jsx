@@ -23,7 +23,7 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     >
       <div className={styles.sectionIntro}>
         <h2 id="cube-section-heading" className={styles.subtitle}>
-          Steering the model's reasoning
+          Steering the model's reasoning.
         </h2>
       </div>
       <div className={styles.sticky}>

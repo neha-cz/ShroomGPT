@@ -10,13 +10,19 @@
 }
 
 .intro {
-  padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0 var(--morph-inset-left);
-  text-align: left;
+  /* Mirror of left-aligned layout: large inset on the right, narrow on the left */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-sizing: border-box;
+  padding: clamp(1.5rem, 4vh, 2.5rem) var(--morph-inset-left) 0 clamp(1rem, 3vw, 2rem);
 }
 
 .title {
   margin: 0 0 clamp(1rem, 2.5vh, 1.5rem) 0;
   max-width: 56rem;
+  width: min(100%, 56rem);
+  text-align: right;
   font-family: var(--font-display);
   font-size: clamp(1.65rem, 3.2vw, 2.35rem);
   font-weight: 600;
@@ -31,26 +37,80 @@
   filter: drop-shadow(0 0 18px rgba(232, 121, 249, 0.35));
 }
 
+.splitRow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .splitRow {
+    flex-direction: row;
+    align-items: center;
+    /* Pack text + Spline together — space-between was opening a huge gap */
+    justify-content: flex-start;
+    gap: clamp(0.5rem, 1.25vw, 1.25rem);
+  }
+}
+
+/* Left column — keep a modest inset from the page edge only */
+.copyColumn {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  overflow-wrap: break-word;
+  margin-left: clamp(1.75rem, 4.25vw, 3.25rem);
+}
+
+@media (min-width: 960px) {
+  .copyColumn {
+    /* Wider measure — previous min(19rem, 28vw) often capped by vw and felt unchanged */
+    flex: 0 0 clamp(16rem, 38vw, 28rem);
+    max-width: min(28rem, 48vw);
+    margin-left: clamp(1.75rem, 4.25vw, 3.5rem);
+  }
+}
+
 .splineWrap {
   position: relative;
-  width: min(110vw, 2400px);
-  height: min(100dvh, 1400px);
+  /* Wider canvas only — no scale() so layout/visual height stays inside the box (no header overlap) */
+  width: min(160vw, 4800px);
+  height: min(100dvh, 1500px);
   max-width: none;
   flex-shrink: 0;
-  margin-left: auto;
-  /* Shift right toward viewport edge */
-  margin-right: clamp(-5rem, -14vw, -2rem);
-  transform: translateX(clamp(1.25rem, 6.5vw, 7.5rem));
+  /*
+   * Scene is centered in a very wide box — needs a large negative translate to move it left.
+   * clamp(MIN, VAL, MAX) must have MIN ≤ VAL ≤ MAX. Using (-50vw, -40vw, -2rem) so we actually
+   * get tens of vw of shift (the old clamp(-7rem,-18vw,-1rem) capped at -7rem whenever -18vw < -7rem).
+   */
+  margin-right: 0;
+  transform: translateX(calc(clamp(-48vw, -38vw, -1.5rem) + clamp(1.5rem, 3.5vw, 3.75rem)));
   overflow: hidden;
   background: #000;
 }
 
+@media (min-width: 960px) {
+  .splineWrap {
+    /* Don’t let flex shrink the canvas — that was making it feel narrower */
+    flex: 0 0 auto;
+    /* Stronger pull on desktop where the wide canvas reads as “stuck on the right” */
+    transform: translateX(calc(clamp(-58vw, -46vw, -3rem) + clamp(1.5rem, 3.5vw, 3.75rem)));
+  }
+}
+
 @media (max-width: 768px) {
   .splineWrap {
-    width: min(100vw, 2400px);
-    height: min(92vh, 1100px);
-    margin-right: clamp(-2.75rem, -8vw, -1rem);
-    transform: translateX(clamp(0.15rem, 2.75vw, 1.75rem));
+    width: min(135vw, 4800px);
+    height: min(92vh, 1150px);
+    transform: translateX(calc(clamp(-42vw, -34vw, -1rem) + clamp(1rem, 2.75vw, 2.75rem)));
   }
 }
 
@@ -62,10 +122,61 @@
 }
 
 .body {
-  display: flex;
-  justify-content: flex-end;
   width: 100%;
   box-sizing: border-box;
-  padding: 0 env(safe-area-inset-right, 0px) clamp(2rem, 5vh, 3.5rem);
-  padding-left: var(--morph-inset-left);
+  /* Mirror CubeSection sticky padding: large inset on the right, small on the left */
+  padding: 0 var(--morph-inset-left) clamp(2rem, 5vh, 3.5rem) clamp(1rem, 3vw, 2rem);
+  padding-right: max(var(--morph-inset-left), env(safe-area-inset-right, 0px));
+  padding-left: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left, 0px));
+}
+
+/* Same copy as CubeSection */
+.lede {
+  margin: 0;
+  max-width: 60rem;
+  width: min(100%, 60rem);
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.45vw, 1.3125rem);
+  line-height: 1.55;
+  font-weight: 400;
+  color: #bbbbbb;
+  text-wrap: pretty;
+  text-align: left;
+}
+
+@media (min-width: 960px) {
+  .copyColumn .lede {
+    max-width: none;
+    width: 100%;
+    font-size: clamp(1.28rem, 1.75vw, 1.55rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+    color: rgba(245, 245, 247, 0.92);
+  }
+}
+
+.copyGradient {
+  margin: clamp(0.85rem, 2vh, 1.15rem) 0 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.45vw, 1.3125rem);
+  line-height: 1.55;
+  font-weight: 400;
+  text-wrap: pretty;
+  text-align: left;
+  background: linear-gradient(100deg, #fce7f3 0%, #e879f9 42%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(232, 121, 249, 0.28));
+}
+
+@media (min-width: 960px) {
+  .copyColumn .copyGradient {
+    font-size: clamp(1.28rem, 1.75vw, 1.55rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+  }
 }
