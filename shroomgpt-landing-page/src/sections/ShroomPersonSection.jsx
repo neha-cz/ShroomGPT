@@ -12,14 +12,14 @@ const FADE_SCROLL_VH = 1.42;
  * those sit on the canvas then the fixed stack fades to black; here we start
  * black and reveal the image as the user scrolls through this block).
  */
-export function ShroomPersonSection() {
+export function ShroomPersonSection({ scrollRootRef } = {}) {
   const reduce = useReducedMotion();
   const sectionRef = useRef(null);
   /** 1 = full black veil; 0 = image fully visible */
   const [veilOpacity, setVeilOpacity] = useState(1);
 
   const updateVeil = useCallback(() => {
-    const el = sectionRef.current;
+    const el = scrollRootRef?.current ?? sectionRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight || 1;
@@ -27,7 +27,7 @@ export function ShroomPersonSection() {
     const scrolled = vh - rect.top;
     const progress = Math.min(1, Math.max(0, scrolled / scrollable));
     setVeilOpacity(1 - progress);
-  }, []);
+  }, [scrollRootRef]);
 
   useEffect(() => {
     if (reduce) {

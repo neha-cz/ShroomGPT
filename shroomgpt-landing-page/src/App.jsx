@@ -4,6 +4,7 @@ import { MushroomFieldProvider, MushroomIcon } from "./components/warp/index.js"
 import { HeroSection } from "./sections/HeroSection.jsx";
 import { ShroomGPTSection } from "./sections/ShroomGPTSection.jsx";
 import { CubeSection } from "./sections/CubeSection.jsx";
+import { MorphArchitectureSection } from "./sections/MorphArchitectureSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
 import { ShroomPersonSection } from "./sections/ShroomPersonSection.jsx";
 import { ThesisSection } from "./sections/ThesisSection.jsx";
@@ -24,6 +25,7 @@ function runwayScrollEndPx(spacerEl) {
 export default function App() {
   const spacerRef = useRef(null);
   const cinematicSpacerRef = useRef(null);
+  const psychedelicStackRef = useRef(null);
   const [heroOverlayOn, setHeroOverlayOn] = useState(true);
   const [sectionsUnlocked, setSectionsUnlocked] = useState(false);
   const [cinematicBackdropAlpha, setCinematicBackdropAlpha] = useState(0);
@@ -122,8 +124,12 @@ export default function App() {
           <>
             <ShroomGPTSection />
             <CubeSection ref={cinematicSpacerRef} />
-            <div className={styles.psychedelicHistoricalStack}>
-              <ShroomPersonSection />
+            <MorphArchitectureSection />
+            <div
+              ref={psychedelicStackRef}
+              className={styles.psychedelicHistoricalStack}
+            >
+              <ShroomPersonSection scrollRootRef={psychedelicStackRef} />
               <div className={styles.psychedelicContent}>
                 <HistoricalSection className={styles.historicalOverPsychedelic} />
                 <ThesisSection className={styles.thesisOverPsychedelic} />
