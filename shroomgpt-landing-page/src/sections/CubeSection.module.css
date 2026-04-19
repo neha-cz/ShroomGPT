@@ -36,24 +36,47 @@
   top: 0;
   z-index: 0;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: clamp(0.5rem, 1.25vw, 0.85rem);
   margin-top: clamp(1.35rem, 3.5vh, 2.75rem);
   padding: 0 clamp(1rem, 3vw, 2rem) clamp(1.5rem, 4vh, 2.5rem);
   padding-left: var(--cube-inset-left);
   box-sizing: border-box;
 }
 
+.splitRow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 960px) {
+  .splitRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1.75rem, 3vw, 3rem);
+  }
+}
+
 .splineWrap {
   position: relative;
-  width: min(76vw, 880px);
-  height: min(62vh, 520px);
+  width: 100%;
+  height: min(66vh, 580px);
   max-width: 100%;
   overflow: hidden;
   background: #000;
+  flex-shrink: 0;
+}
+
+@media (min-width: 960px) {
+  .splineWrap {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    height: min(82vh, 920px);
+    max-width: none;
+  }
 }
 
 .splineCanvas {
@@ -63,26 +86,70 @@
   display: block;
 }
 
-/* Matches ShroomGPTSection `.lede` / `.ledeEmphasis` */
-.copyBelow {
+/* Right column beside Spline on wide viewports */
+.copyColumn {
   position: relative;
   z-index: 2;
-  align-self: stretch;
-  width: 100%;
-  margin-top: 0;
+  flex: 1 1 auto;
+  min-width: 0;
   padding: 0;
   text-align: left;
+  overflow-wrap: break-word;
 }
 
+@media (min-width: 960px) {
+  .copyColumn {
+    flex: 0 0 clamp(12.5rem, 20vw, 16.5rem);
+    max-width: min(16.5rem, 24vw);
+  }
+}
+
+/* Matches ShroomGPTSection `.lede` / `.ledeEmphasis` — larger + tighter column on desktop */
 .lede {
   margin: 0;
   max-width: 60rem;
   font-family: var(--font-body);
   font-size: clamp(1.125rem, 1.45vw, 1.3125rem);
-  line-height: 1.5;
+  line-height: 1.55;
   font-weight: 400;
   color: #bbbbbb;
   text-wrap: pretty;
+}
+
+@media (min-width: 960px) {
+  .copyColumn .lede {
+    max-width: none;
+    font-size: clamp(1.28rem, 1.75vw, 1.55rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+    color: rgba(245, 245, 247, 0.92);
+  }
+}
+
+/* Pink/purple fill; typography matches `.lede` above */
+.copyGradient {
+  margin: clamp(0.85rem, 2vh, 1.15rem) 0 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.45vw, 1.3125rem);
+  line-height: 1.55;
+  font-weight: 400;
+  text-wrap: pretty;
+  background: linear-gradient(100deg, #fce7f3 0%, #e879f9 42%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(232, 121, 249, 0.28));
+}
+
+@media (min-width: 960px) {
+  .copyColumn .copyGradient {
+    font-size: clamp(1.28rem, 1.75vw, 1.55rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+  }
 }
 
 .ledeEmphasis {
@@ -90,6 +157,8 @@
   color: #ffffff;
 }
 
-.copyBelow .lede {
-  margin-top: 0;
+@media (min-width: 960px) {
+  .copyColumn .ledeEmphasis {
+    font-weight: 800;
+  }
 }

@@ -23,23 +23,23 @@ export const CubeSection = forwardRef(function CubeSection(_props, forwardedRef)
     >
       <div className={styles.sectionIntro}>
         <h2 id="cube-section-heading" className={styles.subtitle}>
-          Transforming the LLM architecture
+          Steering the model's reasoning
         </h2>
       </div>
       <div className={styles.sticky}>
-        <div className={styles.splineWrap}>
-          <Spline scene={SPLINE_SCENE_URL} className={styles.splineCanvas} />
-        </div>
-        <div className={styles.copyBelow}>
-          <p className={styles.lede}>
-            Altered-state effects are translated into structured perturbations and injected into the
-            model&apos;s internal activations during inference. As each distorted signal propagates
-            through the remaining layers, it{" "}
-            <strong className={styles.ledeEmphasis}>
-              compounds across every token generated
-            </strong>
-            , producing genuine shifts in reasoning.
-          </p>
+        <div className={styles.splitRow}>
+          <div className={styles.splineWrap}>
+            <Spline scene={SPLINE_SCENE_URL} className={styles.splineCanvas} />
+          </div>
+          <div className={styles.copyColumn}>
+            <p className={styles.lede}>
+              Altered-state effects are injected into the model during LLM inference and propagate
+              through the remaining layers.
+            </p>
+            <p className={styles.copyGradient}>
+              Every token generated reflects genuine shifts in reasoning.
+            </p>
+          </div>
         </div>
       </div>
     </section>
