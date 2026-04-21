@@ -2,7 +2,7 @@ import { useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./ShroomPersonSection.module.css";
 
-const IMG_SRC = "/cropped-pinterest.png";
+const IMG_SRC = "/psychedelic-bkg-again.jpg";
 
 /** Veil reaches 0 after this many viewport heights of scroll (not full section height). */
 const FADE_SCROLL_VH = 1.42;
