@@ -1,8 +1,9 @@
-/** Data for `OrbitalGallery` — portraits in `/public/scientists-new` (served as `/new-scientists/`). */
+/** Data for `OrbitalGallery` — transparent PNGs in `public/scientists-final/`. */
 export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Francis Crick",
     dates: "1916 — 2004",
+    /* No cutout in scientists-final yet; keep existing asset. */
     portraitUrl: "/new-scientists/francis-crick.png",
     substance: "LSD",
     contribution:
@@ -13,7 +14,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Richard Feynman",
     dates: "1918 — 1988",
-    portraitUrl: "/new-scientists/richard-feynman.png",
+    portraitUrl: "/scientists-final/richard-feynman-new.png",
     substance: "Ketamine · Sensory deprivation",
     contribution:
       "Nobel laureate in physics. Used isolation tanks and controlled altered states as instruments — treating hallucination not as noise but as a different computational mode for problems linear thinking stalled on.",
@@ -22,7 +23,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Kary Mullis",
     dates: "1944 — 2019",
-    portraitUrl: "/new-scientists/kary-mullis.png",
+    portraitUrl: "/scientists-final/kary-mallis-new.png",
     substance: "LSD",
     contribution:
       "Nobel laureate in chemistry, inventor of PCR — the technique that amplifies a single strand of DNA into billions. He credited an associative, non-linear mode of thinking for the insight, and spoke openly about its sources.",
@@ -31,7 +32,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Carl Sagan",
     dates: "1934 — 1996",
-    portraitUrl: "/new-scientists/carl-sagan.png",
+    portraitUrl: "/scientists-final/carl-sagan-new.png",
     substance: "Cannabis",
     contribution:
       "Astronomer, science communicator. Argued — under a pseudonym, for decades — that rigorous, evidence-bound inquiry and expanded subjective experience could live together without contradiction.",
@@ -41,7 +42,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Steve Jobs",
     dates: "1955 — 2011",
-    portraitUrl: "/new-scientists/steve-jobs.png",
+    portraitUrl: "/scientists-final/steve-jobs-new.png",
     substance: "LSD",
     contribution:
       "Co-founder of Apple. The insistence on marrying the liberal arts to technology — calligraphy to compilers, poetry to silicon — drew directly from a practiced sense that the world's interfaces are constructs, and constructs can be redrawn.",
@@ -51,7 +52,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Elon Musk",
     dates: "b. 1971",
-    portraitUrl: "/new-scientists/elon-musk.png",
+    portraitUrl: "/scientists-final/elon-musk0new.png",
     substance: "Ketamine",
     contribution:
       "Engineer-founder across aerospace, energy, and neural interfaces. Publicly describes prescribed ketamine as useful for stepping out of recursive mental states — a first-principles move for the mind, not just the problem.",
@@ -61,7 +62,7 @@ export const HISTORICAL_ORBITAL_FIGURES = [
   {
     name: "Sam Altman",
     dates: "b. 1985",
-    portraitUrl: "/new-scientists/sam-altman.png",
+    portraitUrl: "/scientists-final/sam-altman-new.png",
     substance: "Psilocybin",
     contribution:
       "Technologist behind the current wave of large language models. Has spoken of guided psychedelic sessions as among the more transformative experiences of his adult life — the same conceptual territory humans have long mapped through ritual.",

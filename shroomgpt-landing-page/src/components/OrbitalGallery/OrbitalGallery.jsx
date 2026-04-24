@@ -1,22 +1,19 @@
 /**
- * Scroll-driven 3D portrait ring (GSAP ScrollTrigger).
- * @param {Object} props
+ * 3D portrait ring: scroll wheel rotates the ring through one full orbit while the page
+ * position stays fixed; after one full rotation, the page unfreezes and normal scroll continues.
  * @param {{ name, dates, portraitUrl, contribution, quote, substance }[]} props.figures
- * @param {boolean} [props.embedded] — hide built-in title block (use when parent supplies heading).
+ * @param {boolean} [props.embedded]
  */
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./OrbitalGallery.css";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/** ~wheel deltaY units (sum) for one full 0→1 orbit */
+const WHEEL_UNITS_PER_ORBIT = 2400;
 
 function useBreakpoint() {
   const [narrow, setNarrow] = useState(false);
@@ -154,7 +151,6 @@ function RingFigure({ figure, index, total, radius, stackRef }) {
     stackRef.current[index] = {
       el: ref.current,
       portrait: ref.current.querySelector(".og-portrait"),
-      glow: ref.current.querySelector(".og-portrait-glow"),
       label: ref.current.querySelector(".og-portrait-label"),
       baseAngle,
     };
@@ -169,7 +165,6 @@ function RingFigure({ figure, index, total, radius, stackRef }) {
       }}
       data-index={index}
     >
-      <div className="og-portrait-glow" aria-hidden />
       <div className="og-portrait">
         <img
           src={figure.portraitUrl}
@@ -177,7 +172,6 @@ function RingFigure({ figure, index, total, radius, stackRef }) {
           draggable={false}
           loading={index < 3 ? "eager" : "lazy"}
         />
-        <div className="og-portrait-edge" aria-hidden />
       </div>
       <div className="og-portrait-label">
         <span className="og-portrait-label-name">{figure.name}</span>
@@ -196,7 +190,34 @@ export function OrbitalGallery({ figures, embedded = true }) {
   const stageRef = useRef(null);
   const ringRef = useRef(null);
   const stackRef = useRef([]);
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const [orbitComplete, setOrbitComplete] = useState(false);
+  /** True while the stage is in view and we are consuming wheel to rotate (before one full cycle ends). */
+  const [scrollLocked, setScrollLocked] = useState(false);
+
+  const progressRef = useRef(0);
+  const lockScrollYRef = useRef(0);
+  const wheelAccumRef = useRef(0);
+  const capturingRef = useRef(false);
+  const orbitCompleteRef = useRef(false);
+  const applyFrameRef = useRef(null);
+
+  useEffect(() => {
+    orbitCompleteRef.current = orbitComplete;
+  }, [orbitComplete]);
+
+  useEffect(() => {
+    if (reduced) return;
+    if (scrollLocked && !orbitComplete) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+    return undefined;
+  }, [scrollLocked, orbitComplete, reduced]);
 
   const [radius, setRadius] = useState(420);
   useEffect(() => {
@@ -211,86 +232,167 @@ export function OrbitalGallery({ figures, embedded = true }) {
     return () => window.removeEventListener("resize", calc);
   }, []);
 
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: stageRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 0.5,
-        pin: sectionRef.current,
-        pinSpacing: false,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          applyFrame(self.progress);
-        },
-      });
+  const applyFrame = useCallback(
+    (t) => {
+      t = Math.max(0, Math.min(1, t));
+      progressRef.current = t;
+      if (!ringRef.current) return;
 
-      function applyFrame(t) {
-        const slot = 360 / n;
-        const ringAngle = -t * 360;
+      const slot = 360 / n;
+      const ringAngle = -t * 360;
 
-        let bestI = 0;
-        let bestD = Infinity;
-        for (let i = 0; i < n; i++) {
-          const a = ((i / n) * 360 + ringAngle) % 360;
-          const wrapped = ((a + 540) % 360) - 180;
-          const d = Math.abs(wrapped);
-          if (d < bestD) {
-            bestD = d;
-            bestI = i;
-          }
-        }
-        setActiveIndex((prev) => (prev === bestI ? prev : bestI));
-
-        gsap.set(ringRef.current, { rotationY: ringAngle });
-
-        for (let i = 0; i < n; i++) {
-          const node = stackRef.current[i];
-          if (!node) continue;
-          const a = (i / n) * 360 + ringAngle;
-          const wrapped = (((a + 180) % 360) + 360) % 360 - 180;
-          const absA = Math.abs(wrapped);
-
-          const focalWidth = slot * 0.55;
-          const focal = Math.max(0, 1 - absA / focalWidth);
-
-          const scale = 1 + focal * 0.8;
-          const tz = focal * 220;
-          const blur = Math.min(6, (absA / 180) * 6);
-          const sat = 1 - Math.min(0.7, (absA / 180) * 0.9);
-          const facing = Math.cos((wrapped * Math.PI) / 180);
-          const dim = facing < 0 ? Math.max(0.18, 1 + facing * 0.85) : 1;
-
-          gsap.set(node.portrait, {
-            scale,
-            z: tz,
-            filter: `blur(${blur}px) saturate(${sat}) brightness(${dim})`,
-            opacity: Math.max(0.25, dim),
-          });
-          gsap.set(node.glow, {
-            opacity: focal,
-            scale: 1 + focal * 0.12,
-          });
-          gsap.set(node.label, {
-            opacity: focal > 0.4 ? focal : 0,
-            y: (1 - focal) * 14,
-          });
+      let bestI = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < n; i++) {
+        const a = ((i / n) * 360 + ringAngle) % 360;
+        const wrapped = ((a + 540) % 360) - 180;
+        const d = Math.abs(wrapped);
+        if (d < bestD) {
+          bestD = d;
+          bestI = i;
         }
       }
+      setActiveIndex((prev) => (prev === bestI ? prev : bestI));
 
-      applyFrame(0);
-      requestAnimationFrame(() => ST.refresh());
-    }, stageRef);
+      gsap.set(ringRef.current, { rotationY: ringAngle });
 
-    return () => ctx.revert();
-  }, [n, narrow, reduced]);
+      for (let i = 0; i < n; i++) {
+        const node = stackRef.current[i];
+        if (!node) continue;
+        const a = (i / n) * 360 + ringAngle;
+        const wrapped = (((a + 180) % 360) + 360) % 360 - 180;
+        const absA = Math.abs(wrapped);
+
+        const focalWidth = slot * 0.55;
+        const focal = Math.max(0, 1 - absA / focalWidth);
+
+        const scale = 1 + focal * 0.8;
+        const tz = focal * 220;
+
+        gsap.set(node.portrait, {
+          scale,
+          z: tz,
+        });
+        gsap.set(node.label, {
+          opacity: focal > 0.4 ? focal : 0,
+          y: (1 - focal) * 14,
+        });
+      }
+    },
+    [n],
+  );
+
+  useEffect(() => {
+    applyFrameRef.current = applyFrame;
+  }, [applyFrame]);
+
+  const beginCapture = useCallback(() => {
+    if (orbitCompleteRef.current) return;
+    lockScrollYRef.current = window.scrollY;
+    capturingRef.current = true;
+    setScrollLocked(true);
+    wheelAccumRef.current = progressRef.current * WHEEL_UNITS_PER_ORBIT;
+  }, []);
+
+  const endCapture = useCallback(() => {
+    capturingRef.current = false;
+    setScrollLocked(false);
+  }, []);
+
+  /* ScrollTrigger: when the stage straddles the viewport (100vh) — wheel drives orbit, not page scroll. */
+  useLayoutEffect(() => {
+    if (reduced) return;
+    if (!stageRef.current) return;
+
+    const st = ScrollTrigger.create({
+      trigger: stageRef.current,
+      start: "top top",
+      end: "bottom top",
+      onEnter: () => {
+        if (orbitCompleteRef.current) return;
+        beginCapture();
+      },
+      onEnterBack: () => {
+        if (orbitCompleteRef.current) return;
+        beginCapture();
+      },
+      onLeave: endCapture,
+      onLeaveBack: endCapture,
+    });
+
+    requestAnimationFrame(() => {
+      const el = stageRef.current;
+      if (el && !orbitCompleteRef.current) {
+        const r = el.getBoundingClientRect();
+        const vh = window.innerHeight;
+        if (r.top < vh && r.bottom > 0 && r.top >= -1 && r.top < 4) {
+          beginCapture();
+        }
+      }
+      ScrollTrigger.refresh();
+    });
+
+    return () => st.kill();
+  }, [reduced, beginCapture, endCapture, figures.length]);
+
+  /* Wheel: advance orbit without moving the document until one full 0→1, then release. */
+  useEffect(() => {
+    if (reduced) return;
+
+    const enforceLock = () => {
+      if (orbitCompleteRef.current) return;
+      if (!capturingRef.current) return;
+      const y = lockScrollYRef.current;
+      if (Math.abs(window.scrollY - y) > 0.5) {
+        window.scrollTo({ top: y, left: 0, behavior: "auto" });
+      }
+    };
+
+    const onWheel = (e) => {
+      if (orbitCompleteRef.current) return;
+      if (!capturingRef.current) return;
+      e.preventDefault();
+
+      wheelAccumRef.current += e.deltaY;
+      let t = wheelAccumRef.current / WHEEL_UNITS_PER_ORBIT;
+      t = Math.max(0, Math.min(1, t));
+
+      applyFrameRef.current?.(t);
+
+      if (t >= 1) {
+        endCapture();
+        wheelAccumRef.current = WHEEL_UNITS_PER_ORBIT;
+        progressRef.current = 1;
+        setOrbitComplete(true);
+        orbitCompleteRef.current = true;
+        return;
+      }
+
+      enforceLock();
+    };
+
+    const onScroll = () => {
+      enforceLock();
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [reduced, endCapture]);
+
+  useLayoutEffect(() => {
+    if (reduced) return;
+    applyFrame(0);
+  }, [applyFrame, reduced, n, radius]);
 
   useEffect(() => {
     if (!reduced) return;
     let t = 0;
     setActiveIndex(0);
+    setOrbitComplete(true);
     const id = setInterval(() => {
       t = (t + 1) % n;
       setActiveIndex(t);
@@ -298,19 +400,27 @@ export function OrbitalGallery({ figures, embedded = true }) {
     return () => clearInterval(id);
   }, [reduced, n]);
 
-  const scrollHeight = narrow ? "400vh" : "600vh";
+  const setProgressFromIndex = (i) => {
+    const t = Math.max(0, Math.min(1, i / n));
+    progressRef.current = t;
+    wheelAccumRef.current = t * WHEEL_UNITS_PER_ORBIT;
+    applyFrame(t);
+    if (t >= 0.999) {
+      endCapture();
+      setOrbitComplete(true);
+      orbitCompleteRef.current = true;
+    }
+  };
 
   return (
     <div
-      className={[
-        "og-stage",
-        embedded ? "og-stage--embedded" : "",
-      ]
+      className={["og-stage", embedded ? "og-stage--embedded" : ""]
         .filter(Boolean)
         .join(" ")}
       ref={stageRef}
-      style={{ height: reduced ? "auto" : scrollHeight }}
+      style={{ minHeight: reduced ? "auto" : "100vh" }}
       data-reduced={reduced ? "1" : "0"}
+      data-orbit-complete={orbitComplete ? "1" : "0"}
     >
       <section
         ref={sectionRef}
@@ -334,10 +444,10 @@ export function OrbitalGallery({ figures, embedded = true }) {
           </header>
         )}
 
-        {!reduced && (
+        {!reduced && !orbitComplete && (
           <div className="og-scroll-hint" aria-hidden>
-            <span className="og-scroll-hint-label">SCROLL TO ORBIT</span>
-            <span className="og-scroll-hint-arrow">↓</span>
+            <span className="og-scroll-hint-label">SCROLL TO ORBIT (PAGE HOLDS)</span>
+            <span className="og-scroll-hint-arrow">↕</span>
           </div>
         )}
 
@@ -385,16 +495,8 @@ export function OrbitalGallery({ figures, embedded = true }) {
               aria-label={`Focus ${f.name}`}
               type="button"
               onClick={() => {
-                const stage = stageRef.current;
-                if (!stage) return;
-                const rect = stage.getBoundingClientRect();
-                const top = rect.top + window.scrollY;
-                const h = stage.offsetHeight - window.innerHeight;
-                const t = i / figures.length;
-                window.scrollTo({
-                  top: top + h * t,
-                  behavior: reduced ? "auto" : "smooth",
-                });
+                if (reduced) return;
+                setProgressFromIndex(i);
               }}
             >
               <span className="og-progress-dot-dot" />
