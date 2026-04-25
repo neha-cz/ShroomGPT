@@ -3,9 +3,6 @@ import { useReducedMotion } from "framer-motion";
 import gsap from "gsap";
 import styles from "./TarotShuffleReveal.module.css";
 
-/** Same “distance” as the old `end: "+=500%"` — five viewport heights. */
-const VIRTUAL_VIEWPORTS = 5;
-
 function CardBackArt({ idSuffix = 0 }) {
   const gs = (n) => `tgs${idSuffix}-${n}`;
   const u = (n) => `url(#${gs(n)})`;
@@ -233,29 +230,34 @@ function TarotStaticRow({ cards }) {
   );
 }
 
-function lockBody() {
-  const y = window.scrollY;
+/**
+ * Block native scrolling without `body { position: fixed }` (which forces
+ * scrollY to 0 and flashes the top of the page when released).
+ * Wheel/touch is still controlled separately while the deal runs.
+ */
+function lockPageScroll() {
   document.body.dataset.tarotLock = "1";
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${y}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-  document.body.style.overflow = "hidden";
-  document.body.style.overscrollBehavior = "none";
+  const gutter = window.innerWidth - document.documentElement.clientWidth;
+  if (gutter > 0) {
+    document.documentElement.style.paddingRight = `${gutter}px`;
+  }
   document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overscrollBehavior = "none";
+  document.body.style.overscrollBehavior = "none";
+  document.documentElement.style.touchAction = "none";
+  document.body.style.touchAction = "none";
 }
 
-function unlockBody() {
+function unlockPageScroll() {
   delete document.body.dataset.tarotLock;
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  document.body.style.overflow = "";
-  document.body.style.overscrollBehavior = "";
+  document.documentElement.style.paddingRight = "";
   document.documentElement.style.overflow = "";
+  document.body.style.overflow = "";
+  document.documentElement.style.overscrollBehavior = "";
+  document.body.style.overscrollBehavior = "";
+  document.documentElement.style.touchAction = "";
+  document.body.style.touchAction = "";
 }
 
 export default function TarotShuffleReveal({ cards = [] }) {
@@ -265,7 +267,6 @@ export default function TarotShuffleReveal({ cards = [] }) {
   const tlRef = useRef(null);
   /** "before" | "active" | "after" — while active, page scroll is frozen. */
   const phaseRef = useRef("before");
-  const lockY0Ref = useRef(0);
   const touchLastYRef = useRef(null);
   const layoutRef = useRef(null);
 
@@ -424,19 +425,14 @@ export default function TarotShuffleReveal({ cards = [] }) {
   useEffect(() => {
     if (reduce || !cards.length) return;
 
-    const virtualScrollPx = () => VIRTUAL_VIEWPORTS * (window.innerHeight || 1);
-
     const completeLock = () => {
       if (phaseRef.current !== "active") return;
       phaseRef.current = "after";
-      const y0 = lockY0Ref.current;
       const tl = tlRef.current;
       if (tl) tl.progress(1, false);
-      unlockBody();
-      requestAnimationFrame(() => {
-        window.scrollTo(0, y0 + virtualScrollPx());
-        touchLastYRef.current = null;
-      });
+      unlockPageScroll();
+      // scrollY never changed while locked (no body position:fixed) — do not call scrollTo.
+      touchLastYRef.current = null;
     };
 
     const enterLock = () => {
@@ -451,8 +447,7 @@ export default function TarotShuffleReveal({ cards = [] }) {
       }
       const lockY0 = window.scrollY + r.top;
       window.scrollTo({ top: lockY0, left: 0, behavior: "auto" });
-      lockY0Ref.current = lockY0;
-      lockBody();
+      lockPageScroll();
       phaseRef.current = "active";
       touchLastYRef.current = null;
       if (tlRef.current) tlRef.current.progress(0, false);
@@ -530,7 +525,7 @@ export default function TarotShuffleReveal({ cards = [] }) {
       window.removeEventListener("touchstart", onTouchStart, { capture: true });
       window.removeEventListener("touchmove", onTouchMove, { capture: true });
       window.removeEventListener("keydown", onKeyDown, { capture: true });
-      if (document.body.dataset.tarotLock) unlockBody();
+      if (document.body.dataset.tarotLock) unlockPageScroll();
       touchLastYRef.current = null;
     };
   }, [reduce, cards.length]);

@@ -42,7 +42,6 @@ export function HistoricalSection({ className } = {}) {
       </motion.div>
       <div className={styles.tarotRegion}>
         <div className={styles.tarotTrack}>
-          {/* 100dvh = deal stage; 400dvh = remaining flow so lockY0 + 5·viewport reaches the end of this block */}
           <TarotShuffleReveal cards={TAROT_CARDS} />
           <div className={styles.tarotVirtualSpace} aria-hidden="true" />
         </div>

@@ -21,7 +21,7 @@
   width: 100%;
 }
 
-/* 1×(deal 100dvh) + 4 viewports of spacer = 5 viewports of scroll after lock, matching onComplete scrollTo */
+/* Extra scroll runway below the 100dvh deal (replaces a single post-unlock jump; user scrolls through naturally). */
 .tarotVirtualSpace {
   width: 100%;
   min-height: 400vh;
