@@ -82,8 +82,8 @@ export function HeroSection({ scrollRootRef }) {
   const baseDelay = reduce ? 0.08 : 0.45;
   const step = reduce ? 0.04 : 0.09;
 
-  const scrollToWaitlist = () => {
-    document.getElementById("waitlist")?.scrollIntoView({
+  const scrollToPage = () => {
+    document.getElementById("main-content")?.scrollIntoView({
       behavior: reduce ? "auto" : "smooth",
     });
   };
@@ -144,7 +144,7 @@ export function HeroSection({ scrollRootRef }) {
           <MotionButton
             type="button"
             className={styles.cta}
-            onClick={scrollToWaitlist}
+            onClick={scrollToPage}
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: reduce ? 0.35 : 1.35, duration: 0.5 }}

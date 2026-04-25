@@ -7,8 +7,6 @@ import { CubeSection } from "./sections/CubeSection.jsx";
 import { MorphArchitectureSection } from "./sections/MorphArchitectureSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
 import { ShroomPersonSection } from "./sections/ShroomPersonSection.jsx";
-import { ThesisSection } from "./sections/ThesisSection.jsx";
-import { WaitlistSection } from "./sections/WaitlistSection.jsx";
 import styles from "./App.module.css";
 
 /**
@@ -132,8 +130,6 @@ export default function App() {
               <ShroomPersonSection scrollRootRef={psychedelicStackRef} />
               <div className={styles.psychedelicContent}>
                 <HistoricalSection className={styles.historicalOverPsychedelic} />
-                <ThesisSection className={styles.thesisOverPsychedelic} />
-                <WaitlistSection className={styles.waitlistOverPsychedelic} />
               </div>
             </div>
           </>

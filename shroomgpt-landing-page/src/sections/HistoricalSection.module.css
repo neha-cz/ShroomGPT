@@ -1,36 +1,53 @@
 .section {
   position: relative;
+  /* Align copy with CubeSection `.sectionIntro` (e.g. “Steering the model’s reasoning.”) */
+  --historical-inset-left: clamp(3.5rem, 10.5vw, 6.25rem);
   padding-block: clamp(2.5rem, 6vh, 4rem) 0;
   background: transparent;
   border-top: 1px solid rgba(167, 139, 250, 0.1);
   overflow-x: clip;
+  padding-bottom: 0;
 }
 
-/* Full-width orbital stage below the title; sits above psychedelic plate (z-index from App). */
-.orbitalMount {
+.tarotRegion {
   position: relative;
-  z-index: 1;
   width: 100%;
-  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  margin-top: clamp(0.5rem, 2vh, 1.25rem);
+  padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
-/* Layout only — no panel; legibility from layered shadows (cf. Shopify Editions heroes) */
+.tarotTrack {
+  position: relative;
+  width: 100%;
+}
+
+/* 1×(deal 100dvh) + 4 viewports of spacer = 5 viewports of scroll after lock, matching onComplete scrollTo */
+.tarotVirtualSpace {
+  width: 100%;
+  min-height: 400vh;
+  min-height: 400dvh;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Left-aligned, same horizontal origin as CubeSection “Steering the model’s reasoning.” */
 .intro {
   width: 100%;
-  max-width: min(46rem, 100%);
-  margin-inline: auto;
+  max-width: none;
+  margin-inline: 0;
   box-sizing: border-box;
+  padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0 var(--historical-inset-left);
+  text-align: left;
 }
 
 .label {
-  margin-top: 0;
+  margin: 0 0 0.65rem;
   width: 100%;
-  text-align: center;
+  text-align: left;
   font-size: 0.75rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.65rem;
   -webkit-font-smoothing: antialiased;
   text-shadow:
     0 1px 1px rgba(0, 0, 0, 0.95),
@@ -39,22 +56,35 @@
     0 8px 28px rgba(0, 0, 0, 0.4);
 }
 
-.heading {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.75rem, 4.5vw, 3rem);
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  margin: 0 auto;
-  max-width: min(42rem, 100%);
+.title {
+  font-family: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.55rem, 5.7vw, 3.95rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 56rem;
   color: #ffffff;
-  text-align: center;
   -webkit-font-smoothing: antialiased;
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.35),
     0 2px 4px rgba(0, 0, 0, 0.65),
     0 4px 12px rgba(0, 0, 0, 0.55),
-    0 8px 28px rgba(0, 0, 0, 0.45),
-    0 16px 48px rgba(0, 0, 0, 0.35),
-    0 0 1px rgba(0, 0, 0, 0.9);
+    0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 46rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.35vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+  color: rgba(255, 255, 255, 0.92);
+  -webkit-font-smoothing: antialiased;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.45);
 }
