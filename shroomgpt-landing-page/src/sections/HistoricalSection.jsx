@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import TarotShuffleReveal from "../components/TarotShuffleReveal/TarotShuffleReveal.jsx";
 import styles from "./HistoricalSection.module.css";
 
@@ -21,6 +22,28 @@ const TAROT_CARDS = [
 
 export function HistoricalSection({ className } = {}) {
   const reduce = useReducedMotion();
+  const introRef = useRef(null);
+  const [tarotLockOffsetPx, setTarotLockOffsetPx] = useState(0);
+
+  useEffect(() => {
+    const node = introRef.current;
+    if (!node) return;
+
+    const update = () => {
+      const h = node.getBoundingClientRect().height;
+      // Keep heading block visible while tarot stage is locked.
+      setTarotLockOffsetPx(Math.max(0, Math.round(h + 12)));
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(node);
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   return (
     <section
@@ -28,6 +51,7 @@ export function HistoricalSection({ className } = {}) {
       aria-labelledby="historical-heading"
     >
       <motion.div
+        ref={introRef}
         className={styles.intro}
         initial={{ opacity: 0, y: reduce ? 0 : 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -42,7 +66,7 @@ export function HistoricalSection({ className } = {}) {
       </motion.div>
       <div className={styles.tarotRegion}>
         <div className={styles.tarotTrack}>
-          <TarotShuffleReveal cards={TAROT_CARDS} />
+          <TarotShuffleReveal cards={TAROT_CARDS} lockOffsetPx={tarotLockOffsetPx} />
           <div className={styles.tarotVirtualSpace} aria-hidden="true" />
         </div>
       </div>

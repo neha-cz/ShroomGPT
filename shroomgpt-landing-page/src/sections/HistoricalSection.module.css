@@ -5,20 +5,22 @@
   padding-block: clamp(2.5rem, 6vh, 4rem) 0;
   background: transparent;
   border-top: 1px solid rgba(167, 139, 250, 0.1);
-  overflow-x: clip;
+  overflow: visible;
   padding-bottom: 0;
 }
 
 .tarotRegion {
   position: relative;
   width: 100%;
-  margin-top: clamp(0.5rem, 2vh, 1.25rem);
+  margin-top: clamp(-1rem, -0.8vh, -0.35rem);
   padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 .tarotTrack {
   position: relative;
   width: 100%;
+  z-index: 1;
+  margin-top: 0;
 }
 
 /* Extra scroll runway below the 100dvh deal (replaces a single post-unlock jump; user scrolls through naturally). */
@@ -38,6 +40,10 @@
   box-sizing: border-box;
   padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0 var(--historical-inset-left);
   text-align: left;
+  position: sticky;
+  top: clamp(0.4rem, 1.4vh, 0.85rem);
+  z-index: 3;
+  pointer-events: none;
 }
 
 .label {

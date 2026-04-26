@@ -260,7 +260,7 @@ function unlockPageScroll() {
   document.body.style.touchAction = "";
 }
 
-export default function TarotShuffleReveal({ cards = [] }) {
+export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
   const sectionRef = useRef(null);
   const stageRef = useRef(null);
   const cardRefs = useRef([]);
@@ -410,8 +410,6 @@ export default function TarotShuffleReveal({ cards = [] }) {
       );
     });
 
-    const lastDealEnd = dealStart + (N - 1) * dealStep + dealDur;
-    tl.to({}, { duration: Math.max(0, 6 - lastDealEnd) });
     tlRef.current = tl;
 
     return () => {
@@ -424,6 +422,7 @@ export default function TarotShuffleReveal({ cards = [] }) {
 
   useEffect(() => {
     if (reduce || !cards.length) return;
+    const lockOffset = Math.max(0, Number(lockOffsetPx) || 0);
 
     const completeLock = () => {
       if (phaseRef.current !== "active") return;
@@ -440,12 +439,12 @@ export default function TarotShuffleReveal({ cards = [] }) {
       const el = sectionRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      if (r.bottom < 0) {
+      if (r.bottom < lockOffset) {
         phaseRef.current = "after";
         if (tlRef.current) tlRef.current.progress(1, false);
         return;
       }
-      const lockY0 = window.scrollY + r.top;
+      const lockY0 = window.scrollY + r.top - lockOffset;
       window.scrollTo({ top: lockY0, left: 0, behavior: "auto" });
       lockPageScroll();
       phaseRef.current = "active";
@@ -458,28 +457,35 @@ export default function TarotShuffleReveal({ cards = [] }) {
       const el = sectionRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      if (r.bottom < 0) {
+      if (r.bottom < lockOffset) {
         phaseRef.current = "after";
         if (tlRef.current) tlRef.current.progress(1, false);
         return;
       }
-      if (r.top <= 0 && r.bottom > 0) enterLock();
+      if (r.top <= lockOffset && r.bottom > lockOffset) enterLock();
     };
 
-    const progressFromDelta = (delta) => {
+    /** @returns {boolean} true if this event completed the deal (page should be allowed to scroll) */
+    const tryProgressFromDelta = (delta) => {
       const tl = tlRef.current;
-      if (!tl) return;
+      if (!tl) return false;
       const inc = delta * 0.00022;
       const p = Math.min(1, Math.max(0, tl.progress() + inc));
       tl.progress(p, false);
-      if (p >= 0.999) completeLock();
+      if (p >= 0.999) {
+        completeLock();
+        return true;
+      }
+      return false;
     };
 
     const onWheel = (e) => {
       if (phaseRef.current !== "active") return;
-      e.preventDefault();
-      e.stopPropagation();
-      progressFromDelta(e.deltaY);
+      const justFinished = tryProgressFromDelta(e.deltaY);
+      if (!justFinished) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     };
 
     const onTouchStart = (e) => {
@@ -489,26 +495,27 @@ export default function TarotShuffleReveal({ cards = [] }) {
 
     const onTouchMove = (e) => {
       if (phaseRef.current !== "active" || e.touches.length === 0) return;
-      e.preventDefault();
       const y = e.touches[0].clientY;
       const last = touchLastYRef.current;
       if (last == null) {
         touchLastYRef.current = y;
+        e.preventDefault();
         return;
       }
       const dy = last - y;
       touchLastYRef.current = y;
-      progressFromDelta(dy * 1.2);
+      const justFinished = tryProgressFromDelta(dy * 1.2);
+      if (!justFinished) e.preventDefault();
     };
 
     const onKeyDown = (e) => {
       if (phaseRef.current !== "active") return;
       if (e.key === "ArrowDown" || e.key === "PageDown") {
-        e.preventDefault();
-        progressFromDelta(40);
+        const justFinished = tryProgressFromDelta(40);
+        if (!justFinished) e.preventDefault();
       } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-        e.preventDefault();
-        progressFromDelta(-40);
+        const justFinished = tryProgressFromDelta(-40);
+        if (!justFinished) e.preventDefault();
       }
     };
 
@@ -528,7 +535,7 @@ export default function TarotShuffleReveal({ cards = [] }) {
       if (document.body.dataset.tarotLock) unlockPageScroll();
       touchLastYRef.current = null;
     };
-  }, [reduce, cards.length]);
+  }, [reduce, cards.length, lockOffsetPx]);
 
   if (reduce) {
     return <TarotStaticRow cards={cards} />;

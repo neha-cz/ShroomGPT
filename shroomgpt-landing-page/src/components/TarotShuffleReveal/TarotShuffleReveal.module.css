@@ -15,7 +15,7 @@
 
 .card {
   position: absolute;
-  top: 50%;
+  top: 46%;
   left: 50%;
   width: var(--card-w, 200px);
   height: var(--card-h, 300px);
