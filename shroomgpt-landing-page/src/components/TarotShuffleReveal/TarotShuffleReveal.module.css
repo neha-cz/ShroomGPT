@@ -1,5 +1,6 @@
 .scrollSection {
   position: relative;
+  z-index: 0;
   width: 100%;
   height: 100vh;
   background: transparent;
@@ -15,7 +16,9 @@
 
 .card {
   position: absolute;
-  top: 46%;
+  z-index: 2;
+  /* Sits a bit lower so the fanned stack clears the section heading */
+  top: 70%;
   left: 50%;
   width: var(--card-w, 200px);
   height: var(--card-h, 300px);

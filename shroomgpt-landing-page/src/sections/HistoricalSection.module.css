@@ -12,15 +12,17 @@
 .tarotRegion {
   position: relative;
   width: 100%;
-  margin-top: clamp(-1rem, -0.8vh, -0.35rem);
+  margin-top: 0;
   padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
-.tarotTrack {
+/* 100dvh deal + heading share one stacking context so z-index: cards can cover text only when they overlap. */
+.tarotBlock {
   position: relative;
   width: 100%;
-  z-index: 1;
-  margin-top: 0;
+  min-height: 100dvh;
+  min-height: 100vh;
+  isolation: isolate;
 }
 
 /* Extra scroll runway below the 100dvh deal (replaces a single post-unlock jump; user scrolls through naturally). */
@@ -34,15 +36,17 @@
 
 /* Left-aligned, same horizontal origin as CubeSection “Steering the model’s reasoning.” */
 .intro {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: clamp(0.35rem, 1.2vh, 0.65rem);
+  z-index: 1;
   width: 100%;
   max-width: none;
   margin-inline: 0;
   box-sizing: border-box;
   padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 3vw, 2rem) 0 var(--historical-inset-left);
   text-align: left;
-  position: sticky;
-  top: clamp(0.4rem, 1.4vh, 0.85rem);
-  z-index: 3;
   pointer-events: none;
 }
 
