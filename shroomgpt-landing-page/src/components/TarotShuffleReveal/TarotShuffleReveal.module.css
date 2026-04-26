@@ -4,7 +4,8 @@
   width: 100%;
   height: 100vh;
   background: transparent;
-  overflow: hidden;
+  /* Let the fanned cards / drop-shadows extend past the 100vh box (was clipping bottoms). */
+  overflow: visible;
 }
 
 .stage {
