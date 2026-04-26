@@ -302,7 +302,7 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
     const computeFan = () => {
       const vw = stage.clientWidth || window.innerWidth;
       const vh = stage.clientHeight || window.innerHeight;
-      const cardW = Math.max(160, Math.min(260, vw * 0.14));
+      const cardW = Math.max(190, Math.min(310, vw * 0.18));
       const cardH = cardW * 1.5;
       const radius = Math.max(vh * 0.95, cardW * 4.2);
       const spreadDeg = Math.min(56, 8 * N + 8);
