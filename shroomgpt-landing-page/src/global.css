@@ -1,3 +1,29 @@
+/* Hero headline — bundled webfont from public/fonts */
+@font-face {
+  font-family: "Arnold Böcklin";
+  src: url("/fonts/Arnold Boecklin LT W04 Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arnold Boecklin";
+  src: url("/fonts/Arnold Boecklin LT W04 Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Hero headline — Heavy Heap (public/fonts) */
+@font-face {
+  font-family: "Heavy Heap";
+  src: url("/fonts/Heavy Heap Rg.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --void: #030308;
   --cosmic: #06060f;
@@ -8,6 +34,10 @@
   --bio-green: #4ade80;
   --text: #f4f4f8;
   --muted: rgba(244, 244, 248, 0.72);
+  /* Hero copy — cream orange */
+  --cream-orange: #f2e0cc;
+  --cream-orange-muted: rgba(242, 220, 196, 0.9);
+  --cream-orange-stroke: rgba(130, 85, 45, 0.42);
   --glow-cyan: 0 0 18px rgba(34, 211, 238, 0.45), 0 0 42px rgba(34, 211, 238, 0.2);
   --glow-magenta: 0 0 18px rgba(232, 121, 249, 0.45), 0 0 42px rgba(232, 121, 249, 0.2);
   --font-display: "Syne", "Space Grotesk", system-ui, sans-serif;

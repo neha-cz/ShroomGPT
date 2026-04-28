@@ -4,7 +4,7 @@ import styles from "./HistoricalSection.module.css";
 
 const HISTORICAL_TITLE = "The Burning Man effect";
 const HISTORICAL_SUBTITLE =
-  "How psychedelics have shaped the most brilliant minds.";
+  "The brilliant minds whose work was driven by psychedelic experiences.";
 
 const base = import.meta.env.BASE_URL;
 const tarotImage = (n) => `${base}tarot%20cards/${n}.png`;

@@ -11,36 +11,197 @@
 
 .inner {
   text-align: center;
-  max-width: 58rem;
+  max-width: min(70rem, 100%);
   margin-inline: auto;
+  transform: translateY(clamp(5.25rem, 14vh, 9.5rem));
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-weight: 800;
+  position: relative;
+  z-index: 0;
+  font-family: "Heavy Heap", "Arnold Böcklin", "Arnold Boecklin", var(--font-display);
+  font-weight: 400;
+  -webkit-text-stroke: 0.03em var(--cream-orange-stroke, rgba(130, 85, 45, 0.42));
+  paint-order: stroke fill;
   line-height: 0.95;
-  letter-spacing: -0.04em;
-  font-size: clamp(2.75rem, 10vw, 6.5rem);
-  margin: 0 0 clamp(1.5rem, 3vw, 2rem);
-  color: #ffffff;
+  /* Tracking + .arcLetter negative margin = visually squished (decorative font has wide sidebearings). */
+  letter-spacing: -0.05em;
+  text-align: center;
+  width: 100%;
+  font-size: clamp(4.9rem, 19vw, 11.5rem);
+  margin: clamp(1.75rem, 5.5vh, 3.75rem) 0 clamp(1.5rem, 3vw, 2rem);
+  color: var(--cream-orange, #f2e0cc);
+  /* Vertical offset for the arced title. */
+  transform: translateY(clamp(9.5rem, 15.5vh, 12.5rem));
   text-shadow:
-    0.06em 0 0 rgba(255, 60, 120, 0.55),
-    -0.06em 0 0 rgba(34, 211, 238, 0.55),
-    0 0 40px rgba(255, 255, 255, 0.12),
-    0 0 80px rgba(167, 139, 250, 0.18);
+    0 0 36px rgba(255, 200, 150, 0.2),
+    0 0 70px rgba(200, 130, 70, 0.15);
+}
+
+.ctaWrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(1.1rem, 3.2vh, 2.1rem);
+}
+
+/* Poster bar — same palette + corners + filigree as the old hero box */
+.posterCta {
+  --poster-gold: #c0a74d;
+  --poster-ink: #1a2b50;
+  position: relative;
+  appearance: none;
+  display: inline-block;
+  border: 2px solid var(--poster-ink);
+  background: var(--poster-gold);
+  color: var(--poster-ink);
+  cursor: pointer;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-size: clamp(1.05rem, 2.6vw, 1.4rem);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.24em;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 0.9rem 1.85rem 1rem;
+  padding-inline: calc(1.85rem + 0.12em);
+  overflow: hidden;
+  text-align: center;
+}
+
+.posterCta:focus-visible {
+  outline: 2px solid var(--neon-cyan, #22d3ee);
+  outline-offset: 3px;
+}
+
+.posterCta:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.posterCtaBrackets {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.posterCtaCorner {
+  position: absolute;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-color: var(--poster-ink);
+}
+
+.posterCtaCornerTl {
+  top: 0.3rem;
+  left: 0.3rem;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.posterCtaCornerTr {
+  top: 0.3rem;
+  right: 0.3rem;
+  border-top: 2px solid;
+  border-right: 2px solid;
+}
+
+.posterCtaCornerBl {
+  bottom: 0.3rem;
+  left: 0.3rem;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+
+.posterCtaCornerBr {
+  bottom: 0.3rem;
+  right: 0.3rem;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+}
+
+.posterCtaFiligree {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.posterCtaFiligreeSvg {
+  position: absolute;
+  bottom: 0.05rem;
+  left: 0.15rem;
+  width: 38%;
+  max-width: 4.5rem;
+  min-width: 2.4rem;
+  color: var(--poster-ink);
+  opacity: 0.8;
+}
+
+.posterCtaFiligreeRight {
+  left: auto;
+  right: 0.15rem;
+  transform: scaleX(-1);
+}
+
+.posterCtaLabel {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
 }
 
 .headlineLines {
   display: flex;
   flex-direction: column;
-  gap: 0.12em;
+  align-items: center;
+  gap: clamp(0.12em, 1.2vh, 0.35em);
+}
+
+.arcRow {
+  display: block;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* Drop “ON A TRIP” so it clears the arced first line (no vertical overlap) */
+.arcRowInner {
+  margin-top: clamp(0.32em, 2.2vh, 0.75em);
+}
+
+.arcLetter {
+  display: inline-block;
+  transform-origin: 50% 62%;
+  vertical-align: top;
+  /* Overlap sidebearings so single-char spans sit like one line of set type */
+  margin: 0 -0.1em;
+}
+
+.arcLetter:first-of-type {
+  margin-left: 0;
+}
+
+.arcRow .arcLetter:last-of-type {
+  margin-right: 0;
+}
+
+/* Word spaces: a touch less pull than between letters so words don’t fully merge. */
+.arcLetter:has(> .space) {
+  margin-left: -0.04em;
+  margin-right: -0.04em;
 }
 
 .wordRow {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.18em 0.28em;
+  gap: 0.04em 0.1em;
 }
 
 .word {
@@ -54,33 +215,23 @@
   will-change: transform, opacity;
 }
 
+/* Reduced motion: same squish, single line */
+.word .letter {
+  margin: 0 -0.08em;
+}
+
 .space {
   display: inline-block;
   width: 0.32em;
 }
 
-.sub {
-  margin-top: 0;
-  font-size: clamp(1rem, 2.4vw, 1.25rem);
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 36rem;
-  margin-inline: auto;
-  margin-bottom: clamp(2rem, 4vw, 2.75rem);
-  text-shadow: 0 0 18px rgba(0, 0, 0, 0.65);
-}
-
-.ctaWrap {
-  display: flex;
-  justify-content: center;
-}
-
-.cta {
-  cursor: pointer;
+/* Minimal gap between words on the arced headline */
+.arcRow .space {
+  width: 0.03em;
 }
 
 @media (max-width: 480px) {
   .headline {
-    font-size: clamp(2.1rem, 12vw, 3.2rem);
+    font-size: clamp(3.5rem, 18.5vw, 5.25rem);
   }
 }
