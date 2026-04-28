@@ -6,6 +6,4 @@ Simulating psychedelic effects in LLM inference using general relativity-inspire
 ![Shroom](shroom-gpt.png)
 ![Steering](steering.png)
 ![LoRA](lora.png)
-![Historical](new-historical.png)
-![Thesis](new-thesis.png)
-
+![Burning Man](burning-man.png)
