@@ -7,6 +7,11 @@ const FRAME_PATH = (index) => {
   return `/ezgif-6aea8380a2524c7e-jpg/ezgif-frame-${n}.jpg`;
 };
 
+/**
+ * @deprecated For page-wide scroll; prefer a fixed runway (hero spacer) via
+ * `getRunwayEndPx` in `useScrollDrivenDoubleBuffer` so the full document height
+ * does not stretch the filmstrip to a sliver of scroll.
+ */
 export function frameIndexFromScroll(totalFrames) {
   const maxY = Math.max(
     0,
@@ -16,9 +21,17 @@ export function frameIndexFromScroll(totalFrames) {
   return frameIndexFromScrollY(y, maxY, totalFrames, FRAME_SCROLL_SPEED);
 }
 
-/** Same mapping as scroll position `y` over range `[0, maxY]` (top = last frame). */
-export function frameIndexFromScrollY(y, maxY, totalFrames, speed = 1) {
-  const tBase = maxY <= 0 ? 0 : Math.min(1, Math.max(0, y / maxY));
+/**
+ * Maps scroll `y` to a frame: `t = y / scrollRangePx` clamped to [0,1].
+ * Use `scrollRangePx` = hero `.heroSpacer` height − viewport so the morph
+ * always scrubs with the same distance whether or not sections below are mounted
+ * (scroll up reverses; `y` past the range keeps t=1 = “end” frame).
+ */
+export function frameIndexFromScrollY(y, scrollRangePx, totalFrames, speed = 1) {
+  const tBase =
+    scrollRangePx <= 0
+      ? 0
+      : Math.min(1, Math.max(0, y / scrollRangePx));
   const t = Math.min(1, tBase * Math.max(0.1, speed));
   const forward = Math.round(t * (totalFrames - 1));
   /* Top of page = last frame; scrolling down runs the sequence backward */
@@ -27,13 +40,18 @@ export function frameIndexFromScrollY(y, maxY, totalFrames, speed = 1) {
 
 /**
  * Double-buffered frames: decode into hidden layer, swap only if scroll still matches.
+ *
+ * @param {() => number | null} [getRunwayEndPx]  Returns scroll distance (px) for the
+ *   full hero runway (usually spacer height − viewport). When set, `y/that` drives
+ *   the strip so it reverses when scrolling back up, independent of `scrollHeight`.
  */
 export function useScrollDrivenDoubleBuffer(
   img0Ref,
   img1Ref,
   layerClassNames,
   totalFrames = FRAME_COUNT,
-  forcedFrameIndex = null
+  forcedFrameIndex = null,
+  getRunwayEndPx = null
 ) {
   const rafRef = useRef(0);
 
@@ -65,10 +83,25 @@ export function useScrollDrivenDoubleBuffer(
     const visibleEl = () => (frontIs0 ? el0 : el1);
     const hiddenEl = () => (frontIs0 ? el1 : el0);
 
-    const currentFrame = () =>
-      Number.isInteger(forcedFrameIndex)
-        ? forcedFrameIndex
-        : frameIndexFromScroll(totalFrames);
+    const currentFrame = () => {
+      if (Number.isInteger(forcedFrameIndex)) {
+        return forcedFrameIndex;
+      }
+      if (typeof getRunwayEndPx === "function") {
+        const end = getRunwayEndPx();
+        if (end == null || !Number.isFinite(end)) {
+          return frameIndexFromScroll(totalFrames);
+        }
+        const y = window.scrollY;
+        return frameIndexFromScrollY(
+          y,
+          end,
+          totalFrames,
+          FRAME_SCROLL_SPEED
+        );
+      }
+      return frameIndexFromScroll(totalFrames);
+    };
 
     const initial = currentFrame();
     const boot = FRAME_PATH(initial);
@@ -150,7 +183,14 @@ export function useScrollDrivenDoubleBuffer(
       }
       version += 1;
     };
-  }, [img0Ref, img1Ref, layerClassNames, totalFrames, forcedFrameIndex]);
+  }, [
+    img0Ref,
+    img1Ref,
+    layerClassNames,
+    totalFrames,
+    forcedFrameIndex,
+    getRunwayEndPx,
+  ]);
 }
 
 export { FRAME_COUNT, FRAME_PATH, FRAME_SCROLL_SPEED };

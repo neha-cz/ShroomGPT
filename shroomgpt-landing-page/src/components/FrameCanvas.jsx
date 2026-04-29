@@ -10,7 +10,11 @@ const layerClasses = {
   off: styles.layerOff,
 };
 
-export function FrameCanvas({ frozenFrameIndex = null }) {
+/**
+ * @param {() => number} getRunwayEndPx  Hero runway length in px (spacer height − viewport).
+ *   Drives the morph so it reverses when scrolling back up, independent of page height.
+ */
+export function FrameCanvas({ getRunwayEndPx }) {
   const img0Ref = useRef(null);
   const img1Ref = useRef(null);
 
@@ -19,7 +23,8 @@ export function FrameCanvas({ frozenFrameIndex = null }) {
     img1Ref,
     layerClasses,
     FRAME_COUNT,
-    frozenFrameIndex
+    null,
+    getRunwayEndPx
   );
 
   return (

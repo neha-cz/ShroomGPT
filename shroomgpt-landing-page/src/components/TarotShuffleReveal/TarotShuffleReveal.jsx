@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import gsap from "gsap";
 import styles from "./TarotShuffleReveal.module.css";
@@ -260,7 +260,11 @@ function unlockPageScroll() {
   document.body.style.touchAction = "";
 }
 
-export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
+export default function TarotShuffleReveal({
+  cards = [],
+  lockOffsetPx = 0,
+  onDealComplete = undefined,
+}) {
   const sectionRef = useRef(null);
   const stageRef = useRef(null);
   const cardRefs = useRef([]);
@@ -269,6 +273,13 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
   const phaseRef = useRef("before");
   const touchLastYRef = useRef(null);
   const layoutRef = useRef(null);
+  const dealCompleteNotifiedRef = useRef(false);
+
+  const notifyDealComplete = useCallback(() => {
+    if (dealCompleteNotifiedRef.current) return;
+    dealCompleteNotifiedRef.current = true;
+    onDealComplete?.();
+  }, [onDealComplete]);
 
   cardRefs.current = [];
 
@@ -348,9 +359,9 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
 
     const layout0 = layoutRef.current;
     const dealOrder = [...Array(N).keys()].reverse();
-    const dealStart = 0.6;
-    const dealStep = 0.55;
-    const dealDur = 1.0;
+    const dealStart = 0.5;
+    const dealStep = 0.46;
+    const dealDur = 0.85;
 
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.inOut" } });
 
@@ -432,6 +443,7 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
       unlockPageScroll();
       // scrollY never changed while locked (no body position:fixed) — do not call scrollTo.
       touchLastYRef.current = null;
+      notifyDealComplete();
     };
 
     const enterLock = () => {
@@ -442,6 +454,7 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
       if (r.bottom < lockOffset) {
         phaseRef.current = "after";
         if (tlRef.current) tlRef.current.progress(1, false);
+        notifyDealComplete();
         return;
       }
       const lockY0 = window.scrollY + r.top - lockOffset;
@@ -460,6 +473,7 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
       if (r.bottom < lockOffset) {
         phaseRef.current = "after";
         if (tlRef.current) tlRef.current.progress(1, false);
+        notifyDealComplete();
         return;
       }
       if (r.top <= lockOffset && r.bottom > lockOffset) enterLock();
@@ -535,7 +549,15 @@ export default function TarotShuffleReveal({ cards = [], lockOffsetPx = 0 }) {
       if (document.body.dataset.tarotLock) unlockPageScroll();
       touchLastYRef.current = null;
     };
-  }, [reduce, cards.length, lockOffsetPx]);
+  }, [reduce, cards.length, lockOffsetPx, notifyDealComplete]);
+
+  useEffect(() => {
+    if (!reduce || !cards.length) return;
+    const t = window.setTimeout(() => {
+      notifyDealComplete();
+    }, 450);
+    return () => clearTimeout(t);
+  }, [reduce, cards.length, notifyDealComplete]);
 
   if (reduce) {
     return <TarotStaticRow cards={cards} />;

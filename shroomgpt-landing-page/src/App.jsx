@@ -7,6 +7,7 @@ import { CubeSection } from "./sections/CubeSection.jsx";
 import { MorphArchitectureSection } from "./sections/MorphArchitectureSection.jsx";
 import { HistoricalSection } from "./sections/HistoricalSection.jsx";
 import { ShroomPersonSection } from "./sections/ShroomPersonSection.jsx";
+import { FinalBkgAnimation } from "./components/FinalBkgAnimation.jsx";
 import styles from "./App.module.css";
 
 /**
@@ -25,43 +26,35 @@ export default function App() {
   const cinematicSpacerRef = useRef(null);
   const psychedelicStackRef = useRef(null);
   const [heroOverlayOn, setHeroOverlayOn] = useState(true);
-  const [sectionsUnlocked, setSectionsUnlocked] = useState(false);
+  /** After the first time the user leaves the hero runway, keep sections in the DOM. */
+  const [everUnlocked, setEverUnlocked] = useState(false);
   const [cinematicBackdropAlpha, setCinematicBackdropAlpha] = useState(0);
-  /** Once the user scrolls past the runway, keep the overlay off until they return ~to top. */
-  const leftRunwayRef = useRef(false);
 
-  const syncHeroOverlay = useCallback(() => {
+  const getRunwayEndPx = useCallback(() => runwayScrollEndPx(spacerRef.current), []);
+
+  const syncFromScroll = useCallback(() => {
     const el = spacerRef.current;
     if (!el) return;
     const end = runwayScrollEndPx(el);
     const y = window.scrollY;
-    if (y <= 1) leftRunwayRef.current = false;
-    if (y >= end - 1) leftRunwayRef.current = true;
-    if (sectionsUnlocked) {
-      setHeroOverlayOn(false);
-      return;
+    setHeroOverlayOn(y < end);
+    if (y >= end) {
+      setEverUnlocked((u) => u || true);
     }
-    if (y >= end - 1) {
-      setSectionsUnlocked(true);
-      setHeroOverlayOn(false);
-      return;
-    }
-    const show = !leftRunwayRef.current && y < end - 1;
-    setHeroOverlayOn(show);
-  }, [sectionsUnlocked]);
+  }, []);
 
   useEffect(() => {
-    syncHeroOverlay();
-    window.addEventListener("scroll", syncHeroOverlay, { passive: true });
-    window.addEventListener("resize", syncHeroOverlay, { passive: true });
+    syncFromScroll();
+    window.addEventListener("scroll", syncFromScroll, { passive: true });
+    window.addEventListener("resize", syncFromScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", syncHeroOverlay);
-      window.removeEventListener("resize", syncHeroOverlay);
+      window.removeEventListener("scroll", syncFromScroll);
+      window.removeEventListener("resize", syncFromScroll);
     };
-  }, [syncHeroOverlay]);
+  }, [syncFromScroll]);
 
   useEffect(() => {
-    if (!sectionsUnlocked) {
+    if (!everUnlocked) {
       setCinematicBackdropAlpha(0);
       return;
     }
@@ -86,13 +79,13 @@ export default function App() {
       window.removeEventListener("scroll", updateFade);
       window.removeEventListener("resize", updateFade);
     };
-  }, [sectionsUnlocked]);
+  }, [everUnlocked]);
 
   return (
     <MushroomFieldProvider>
       <MushroomIcon />
-      <FrameCanvas frozenFrameIndex={sectionsUnlocked ? 0 : null} />
-      {sectionsUnlocked ? (
+      <FrameCanvas getRunwayEndPx={getRunwayEndPx} />
+      {everUnlocked ? (
         <>
           <div
             className={styles.overlay}
@@ -118,7 +111,7 @@ export default function App() {
       </div>
       <main className={styles.main} id="main-content">
         <div ref={spacerRef} className={styles.heroSpacer} aria-hidden="true" />
-        {sectionsUnlocked ? (
+        {everUnlocked ? (
           <>
             <ShroomGPTSection />
             <CubeSection ref={cinematicSpacerRef} />
@@ -132,6 +125,7 @@ export default function App() {
                 <HistoricalSection className={styles.historicalOverPsychedelic} />
               </div>
             </div>
+            <FinalBkgAnimation />
           </>
         ) : null}
       </main>
