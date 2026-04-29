@@ -13,6 +13,8 @@ export default defineConfig({
     host: true,
     port,
     strictPort: true,
+    // Vite 6+ host header check; Render uses *.onrender.com
+    allowedHosts: [".onrender.com", "shroomgpt.onrender.com"],
   },
   server: {
     host: true,
