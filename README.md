@@ -2,8 +2,10 @@
 
 Simulating psychedelic effects in LLM inference using general relativity-inspired ODEs and fine-tuned LoRA models.
 
-![Hero](new-hero.png)
-![Shroom](shroom-gpt.png)
-![Steering](steering.png)
-![LoRA](lora.png)
-![Burning Man](burning-man.png)
+![Hero](hero-final.png)
+![Shroom](final-shroom.png)
+![Steering](final-steering.png)
+![LoRA](final-lora.png)
+![Burning Man](final-burning-man.png)
+![Quotes](final-quotes.png)
+![Ending](final-ending.png)
