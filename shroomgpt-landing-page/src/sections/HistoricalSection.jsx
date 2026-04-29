@@ -58,10 +58,11 @@ export function HistoricalSection({ className } = {}) {
             <Fragment>
               <motion.blockquote
                 className={styles.jobsQuote}
-                initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.28 }}
                 transition={{
-                  duration: reduce ? 0.2 : 0.9,
+                  duration: reduce ? 0.2 : 1.4,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
@@ -72,11 +73,11 @@ export function HistoricalSection({ className } = {}) {
               </motion.blockquote>
               <motion.blockquote
                 className={styles.mullisQuote}
-                initial={{ opacity: 0, y: reduce ? 0 : 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.28 }}
                 transition={{
-                  duration: reduce ? 0.2 : 0.85,
-                  delay: reduce ? 0 : 0.2,
+                  duration: reduce ? 0.2 : 1.4,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
@@ -87,11 +88,11 @@ export function HistoricalSection({ className } = {}) {
               </motion.blockquote>
               <motion.blockquote
                 className={styles.saganQuote}
-                initial={{ opacity: 0, y: reduce ? 0 : 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, amount: 0.28 }}
                 transition={{
-                  duration: reduce ? 0.2 : 0.85,
-                  delay: reduce ? 0 : 0.3,
+                  duration: reduce ? 0.2 : 1.4,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
