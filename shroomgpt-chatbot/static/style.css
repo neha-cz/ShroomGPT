@@ -1,0 +1,372 @@
+/* Liquid glass + glassmorphism */
+:root {
+  /* Slightly stronger frost so UI stays legible on a vivid illustrated BG */
+  --glass-bg: rgba(255, 255, 255, 0.11);
+  --glass-border: rgba(255, 255, 255, 0.28);
+  --glass-shine: rgba(255, 255, 255, 0.5);
+  --text: #f0f4ff;
+  --text-muted: rgba(240, 244, 255, 0.6);
+  --user-bubble: rgba(120, 200, 255, 0.2);
+  --bot-bubble: rgba(255, 255, 255, 0.06);
+  --accent: #7ee8fa;
+  --accent-2: #6b8cff;
+  --radius: 1.25rem;
+  --font: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background: #060818;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* Full-bleed art background (served from /static/chat-bkg-2.jpg) */
+.scene-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #0a0618;
+  background-image: url("chat-bkg-2.jpg");
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Vignette + light tone map so glass picks up color from the art */
+.scene-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse 95% 85% at 50% 45%,
+      rgba(6, 4, 18, 0.08) 0%,
+      rgba(6, 4, 18, 0.45) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(4, 6, 20, 0.35) 0%,
+      transparent 28%,
+      transparent 72%,
+      rgba(4, 6, 22, 0.55) 100%
+    );
+}
+
+/* Glass surface */
+.glass {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 0 var(--glass-shine);
+  border-radius: var(--radius);
+  z-index: 1;
+}
+
+.shell {
+  position: relative;
+  width: min(100%, 760px);
+  max-height: min(92vh, 720px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 2;
+  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.55));
+}
+
+.panel-header,
+.panel-chat,
+.panel-input {
+  width: 100%;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.orb {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes sheen {
+  0%,
+  100% {
+    filter: brightness(1) hue-rotate(0deg);
+  }
+  50% {
+    filter: brightness(1.15) hue-rotate(15deg);
+  }
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: "Syne", "Space Grotesk", system-ui, sans-serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.sub {
+  margin: 0.15rem 0 0;
+  font-size: 1.22rem;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.pill {
+  font-size: 1.08rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.panel-chat {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.25rem 0.2rem 0.5rem;
+  scroll-behavior: smooth;
+}
+
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.bubble {
+  max-width: 90%;
+  padding: 0.7rem 0.95rem;
+  border-radius: 1.1rem;
+  font-size: 1.18rem;
+  line-height: 1.45;
+  font-weight: 400;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--user-bubble);
+  border-bottom-right-radius: 0.3rem;
+  font-family: "Syne", "Space Grotesk", system-ui, sans-serif;
+  font-size: 1.18rem;
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+  background: var(--bot-bubble);
+  border-bottom-left-radius: 0.3rem;
+  font-size: 1.3rem;
+}
+
+.bubble.typing {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.bubble.error {
+  border-color: rgba(255, 120, 120, 0.4);
+  background: rgba(255, 60, 60, 0.1);
+  color: #ffcccc;
+}
+
+.empty-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.24rem;
+  line-height: 1.5;
+  margin: auto 1rem;
+  max-width: 32ch;
+}
+
+.empty-hint.hidden {
+  display: none;
+}
+
+.panel-input {
+  padding: 0.75rem 0.85rem 0.65rem;
+  flex-shrink: 0;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.input-glass {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.9rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#user-input {
+  width: 100%;
+  min-height: 2.75rem;
+  max-height: 8rem;
+  resize: none;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: "Syne", "Space Grotesk", system-ui, sans-serif;
+  font-size: 1.18rem;
+  line-height: 1.4;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+}
+
+#user-input::placeholder {
+  color: var(--text-muted);
+}
+
+.send {
+  position: relative;
+  border: none;
+  cursor: pointer;
+  font-family: "Syne", "Space Grotesk", system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.12rem;
+  color: #041018;
+  background: linear-gradient(135deg, #a5f3fc, #93c5fd, #a5b4fc);
+  background-size: 200% 200%;
+  padding: 0.65rem 1.1rem;
+  border-radius: 0.85rem;
+  min-height: 2.75rem;
+  min-width: 4.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(100, 200, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.send:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(100, 200, 255, 0.45);
+}
+
+.send:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.send .send-ripple {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: ripple 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  0%,
+  100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+.send-text {
+  position: relative;
+  z-index: 1;
+}
+
+.disclaimer {
+  margin: 0.55rem 0 0;
+  font-size: 0.98rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ShroomGPT — Llama Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600&family=Syne:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="scene-photo" aria-hidden="true"></div>
+    <div class="scene-veil" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="glass panel-header">
+        <div class="brand">
+          <img
+            class="orb"
+            src="{{ url_for('static', filename='shroom-logo.png') }}"
+            alt="ShroomGPT logo"
+          />
+          <div>
+            <h1>ShroomGPT</h1>
+            <p class="sub">Take your AI on a trip.</p>
+          </div>
+        </div>
+      </header>
+
+      <section id="chat" class="glass panel-chat" aria-live="polite">
+        <div class="messages" id="messages"></div>
+        <p id="empty" class="empty-hint">
+          Ask ShroomGPT anything you want and watch it trip in real time. 
+        </p>
+      </section>
+
+      <footer class="glass panel-input">
+        <form id="form" class="input-row" autocomplete="off">
+          <label for="user-input" class="visually-hidden">Message</label>
+          <div class="input-glass">
+            <textarea
+              id="user-input"
+              name="message"
+              rows="1"
+              placeholder="Type a message…"
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="send" id="send" aria-label="Send">
+            <span class="send-text">Send</span>
+            <span class="send-ripple" aria-hidden="true"></span>
+          </button>
+        </form>
+      </footer>
+    </main>
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+  </body>
+</html>
