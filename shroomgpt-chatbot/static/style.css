@@ -142,6 +142,7 @@ body {
   font-size: 1.7rem;
   font-weight: 600;
   letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .sub {
@@ -369,4 +370,60 @@ body {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+/* Pretext manuscript-style warping */
+.warp-host {
+  display: block;
+}
+
+.warp-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  line-height: inherit;
+}
+
+.warp-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.warp-char {
+  display: inline-block;
+  transform-origin: center 75%;
+  transform: translate3d(var(--warp-x, 0px), var(--warp-y, 0px), 0) rotate(var(--warp-r, 0deg))
+    scale(var(--warp-s, 1));
+  opacity: var(--warp-a, 1);
+  transition: transform 55ms linear, opacity 55ms linear;
+  will-change: transform;
+}
+
+/* Cursor-follow mushroom icon */
+#cursor-mushroom {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1000;
+  transform: translate3d(-999px, -999px, 0) scale(0.95);
+  transition: opacity 140ms ease;
+  opacity: 0;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warp-char {
+    transition: none;
+    transform: none;
+  }
+
+  #cursor-mushroom {
+    transition: none;
+    display: none;
+  }
 }

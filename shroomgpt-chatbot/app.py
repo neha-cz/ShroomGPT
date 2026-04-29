@@ -9,7 +9,7 @@ Prod: gunicorn -w 1 -b 0.0.0.0:5001 app:app
 import os
 
 import requests
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -34,6 +34,11 @@ def _ollama_messages(history: list, new_message: str) -> list:
 @app.route("/")
 def index():
     return render_template("index.html", model=OLLAMA_MODEL, ollama_url=OLLAMA_BASE_URL)
+
+
+@app.get("/mushroom.png")
+def mushroom_icon():
+    return send_from_directory(app.root_path, "mushroom.png")
 
 
 @app.route("/api/health", methods=["GET"])
