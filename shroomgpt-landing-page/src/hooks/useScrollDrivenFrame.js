@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { heroEzgifFramePath } from "../lib/ezgifPaths.js";
-import { safeDecodeImage } from "../lib/safeImageDecode.js";
+import {
+  prefetchFrameNeighborhood,
+  safeDecodeImage,
+  scheduleIdleFilmstripPrefetch,
+} from "../lib/safeImageDecode.js";
 
 const FRAME_COUNT = 240;
 const FRAME_SCROLL_SPEED = 2.2;
@@ -113,6 +117,12 @@ export function useScrollDrivenDoubleBuffer(
     visibleEl().dataset.frameSrc = boot;
     applyLayerClasses(true);
     displayed = initial;
+    prefetchFrameNeighborhood(FRAME_PATH, initial, totalFrames, 56, 56);
+    const cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
+      FRAME_PATH,
+      totalFrames,
+      { batchSize: 14 }
+    );
 
     const pump = async () => {
       let safety = 0;
@@ -132,6 +142,7 @@ export function useScrollDrivenDoubleBuffer(
           frontIs0 = !frontIs0;
           applyLayerClasses(frontIs0);
           displayed = want;
+          prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 48, 48);
           continue;
         }
 
@@ -150,6 +161,7 @@ export function useScrollDrivenDoubleBuffer(
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
+        prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 48, 48);
       }
     };
 
@@ -187,6 +199,7 @@ export function useScrollDrivenDoubleBuffer(
 
     return () => {
       alive = false;
+      cancelIdlePrefetch();
       window.removeEventListener("load", onLoad);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);

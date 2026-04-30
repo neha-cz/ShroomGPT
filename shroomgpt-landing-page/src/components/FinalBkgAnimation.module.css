@@ -31,6 +31,8 @@
   object-fit: cover;
   pointer-events: none;
   user-select: none;
+  transform: translateZ(0);
+  will-change: opacity;
 }
 
 .layerOn {

@@ -3,6 +3,7 @@ import { shroomgptEzgifFramePath } from "../lib/ezgifPaths.js";
 import {
   prefetchFrameRing,
   safeDecodeImage,
+  scheduleIdleFilmstripPrefetch,
 } from "../lib/safeImageDecode.js";
 import styles from "./AutoplayFrameFilm.module.css";
 
@@ -57,7 +58,12 @@ export function AutoplayFrameFilm({ className = "" }) {
     el1.dataset.frameSrc = "";
     applyLayerClasses(true);
     displayed = 0;
-    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 32);
+    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 56);
+    const cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
+      frameUrl,
+      FRAME_COUNT,
+      { batchSize: 14 }
+    );
 
     let pumping = false;
 
@@ -77,7 +83,7 @@ export function AutoplayFrameFilm({ className = "" }) {
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
-        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 28);
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 52);
       }
     };
 
@@ -100,6 +106,7 @@ export function AutoplayFrameFilm({ className = "" }) {
 
     return () => {
       alive = false;
+      cancelIdlePrefetch();
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);

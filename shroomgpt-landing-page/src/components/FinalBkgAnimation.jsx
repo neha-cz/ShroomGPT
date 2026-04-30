@@ -6,6 +6,7 @@ import { publicUrl } from "../lib/publicUrl.js";
 import {
   prefetchFrameRing,
   safeDecodeImage,
+  scheduleIdleFilmstripPrefetch,
 } from "../lib/safeImageDecode.js";
 import styles from "./FinalBkgAnimation.module.css";
 
@@ -79,10 +80,18 @@ export function FinalBkgAnimation() {
       el0.dataset.frameSrc = u0;
       el1.dataset.frameSrc = "";
       applyLayerClasses(true);
-      prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 32);
     };
 
     resetPlayback();
+    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 56);
+    let cancelIdlePrefetch = () => {};
+    const idleDelayHandle = window.setTimeout(() => {
+      cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
+        frameUrl,
+        FRAME_COUNT,
+        { batchSize: 14 }
+      );
+    }, 2400);
 
     let pumping = false;
 
@@ -103,7 +112,7 @@ export function FinalBkgAnimation() {
         applyLayerClasses(frontIs0);
         displayed = want;
         playbackProgress.set(want / (FRAME_COUNT - 1));
-        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 28);
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 52);
       }
     };
 
@@ -139,6 +148,8 @@ export function FinalBkgAnimation() {
 
     return () => {
       alive = false;
+      clearTimeout(idleDelayHandle);
+      cancelIdlePrefetch();
       io.disconnect();
       if (rafId) cancelAnimationFrame(rafId);
     };
