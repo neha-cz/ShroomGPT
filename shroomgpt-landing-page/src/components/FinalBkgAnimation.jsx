@@ -55,18 +55,6 @@ export function FinalBkgAnimation() {
       }
     };
 
-    if (reduce) {
-      const u = frameUrl(0);
-      el0.src = u;
-      el0.dataset.frameSrc = u;
-      el1.dataset.frameSrc = "";
-      applyLayerClasses(true);
-      playbackProgress.set(1);
-      return () => {
-        alive = false;
-      };
-    }
-
     let frontIs0 = true;
     let displayed = 0;
     let t0 = performance.now();
@@ -155,7 +143,7 @@ export function FinalBkgAnimation() {
       io.disconnect();
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [playbackProgress, reduce]);
+  }, [playbackProgress]);
 
   return (
     <section

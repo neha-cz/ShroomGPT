@@ -7,6 +7,7 @@ const port = process.env.PORT
   : 4173;
 
 export default defineConfig({
+  base: "/",
   plugins: [react()],
   publicDir: "public",
   preview: {

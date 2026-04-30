@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion.js";
 import { publicUrl } from "../lib/publicUrl.js";
 import styles from "./AutoplayFrameFilm.module.css";
 
@@ -20,7 +19,6 @@ function frameUrl(index) {
 export function AutoplayFrameFilm({ className = "" }) {
   const img0Ref = useRef(null);
   const img1Ref = useRef(null);
-  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
     const el0 = img0Ref.current;
@@ -43,17 +41,6 @@ export function AutoplayFrameFilm({ className = "" }) {
         el0.classList.remove(styles.layerOn);
       }
     };
-
-    if (reduce) {
-      const u = frameUrl(0);
-      el0.src = u;
-      el0.dataset.frameSrc = u;
-      el1.dataset.frameSrc = "";
-      applyLayerClasses(true);
-      return () => {
-        alive = false;
-      };
-    }
 
     const t0 = performance.now();
     let frontIs0 = true;
@@ -119,7 +106,7 @@ export function AutoplayFrameFilm({ className = "" }) {
       alive = false;
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [reduce]);
+  }, []);
 
   return (
     <div
