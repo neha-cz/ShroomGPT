@@ -124,7 +124,11 @@ export function useScrollDrivenDoubleBuffer(
         const hid = hiddenEl();
         const next = FRAME_PATH(want);
 
-        if (hid.dataset.frameSrc === next && hid.complete) {
+        if (
+          hid.dataset.frameSrc === next &&
+          hid.complete &&
+          hid.naturalWidth > 0
+        ) {
           frontIs0 = !frontIs0;
           applyLayerClasses(frontIs0);
           displayed = want;
@@ -134,8 +138,9 @@ export function useScrollDrivenDoubleBuffer(
         hid.src = next;
         hid.dataset.frameSrc = next;
 
-        await safeDecodeImage(hid);
+        const ok = await safeDecodeImage(hid, next);
         if (!alive) return;
+        if (!ok) continue;
 
         const latest = currentFrame();
         if (latest !== want) {

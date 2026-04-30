@@ -3,7 +3,10 @@ import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion.js";
 import { finalBkgEzgifFramePath } from "../lib/ezgifPaths.js";
 import { publicUrl } from "../lib/publicUrl.js";
-import { safeDecodeImage } from "../lib/safeImageDecode.js";
+import {
+  prefetchFrameRing,
+  safeDecodeImage,
+} from "../lib/safeImageDecode.js";
 import styles from "./FinalBkgAnimation.module.css";
 
 const FRAME_COUNT = 240;
@@ -76,6 +79,7 @@ export function FinalBkgAnimation() {
       el0.dataset.frameSrc = u0;
       el1.dataset.frameSrc = "";
       applyLayerClasses(true);
+      prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 32);
     };
 
     resetPlayback();
@@ -91,14 +95,15 @@ export function FinalBkgAnimation() {
         const next = frameUrl(want);
         hid.src = next;
         hid.dataset.frameSrc = next;
-        await safeDecodeImage(hid);
+        const ok = await safeDecodeImage(hid, next);
         if (!alive) return;
-        if (frameAtTime(performance.now()) !== want) continue;
+        if (!ok) continue;
 
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
         playbackProgress.set(want / (FRAME_COUNT - 1));
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 28);
       }
     };
 

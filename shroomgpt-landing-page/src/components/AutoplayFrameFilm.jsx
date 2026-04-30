@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import { shroomgptEzgifFramePath } from "../lib/ezgifPaths.js";
-import { safeDecodeImage } from "../lib/safeImageDecode.js";
+import {
+  prefetchFrameRing,
+  safeDecodeImage,
+} from "../lib/safeImageDecode.js";
 import styles from "./AutoplayFrameFilm.module.css";
 
 const FRAME_COUNT = 240;
@@ -54,6 +57,7 @@ export function AutoplayFrameFilm({ className = "" }) {
     el1.dataset.frameSrc = "";
     applyLayerClasses(true);
     displayed = 0;
+    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 32);
 
     let pumping = false;
 
@@ -66,14 +70,14 @@ export function AutoplayFrameFilm({ className = "" }) {
         const next = frameUrl(want);
         hid.src = next;
         hid.dataset.frameSrc = next;
-        await safeDecodeImage(hid);
+        const ok = await safeDecodeImage(hid, next);
         if (!alive) return;
-        const latest = frameAtTime(performance.now());
-        if (latest !== want) continue;
+        if (!ok) continue;
 
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 28);
       }
     };
 
