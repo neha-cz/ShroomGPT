@@ -1,5 +1,6 @@
-import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion.js";
+import { publicUrl } from "../lib/publicUrl.js";
 import styles from "./AutoplayFrameFilm.module.css";
 
 const FRAME_COUNT = 240;
@@ -9,7 +10,7 @@ const FILM_DIR = "ezgif-29069d220b1923cd-jpg";
 
 function frameUrl(index) {
   const n = String(index + 1).padStart(3, "0");
-  return `/${FILM_DIR}/ezgif-frame-${n}.jpg`;
+  return publicUrl(`${FILM_DIR}/ezgif-frame-${n}.jpg`);
 }
 
 /**
@@ -19,7 +20,7 @@ function frameUrl(index) {
 export function AutoplayFrameFilm({ className = "" }) {
   const img0Ref = useRef(null);
   const img1Ref = useRef(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
     const el0 = img0Ref.current;

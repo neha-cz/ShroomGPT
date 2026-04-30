@@ -1,11 +1,7 @@
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion.js";
+import { publicUrl } from "../lib/publicUrl.js";
 import styles from "./FinalBkgAnimation.module.css";
 
 const FRAME_COUNT = 240;
@@ -14,14 +10,14 @@ const DIR = "final-bkg-animation-folder";
 
 function frameUrl(index) {
   const n = String(index + 1).padStart(3, "0");
-  return `/${DIR}/ezgif-frame-${n}.jpg`;
+  return publicUrl(`${DIR}/ezgif-frame-${n}.jpg`);
 }
 
 export function FinalBkgAnimation() {
   const sectionRef = useRef(null);
   const img0Ref = useRef(null);
   const img1Ref = useRef(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "start start"],
@@ -168,7 +164,7 @@ export function FinalBkgAnimation() {
       aria-labelledby="final-bkg-heading"
     >
       <motion.img
-        src="/cross-fade.png"
+        src={publicUrl("cross-fade.png")}
         className={styles.baseBg}
         style={{ opacity: reduce ? 0 : bgOpacity }}
         alt=""

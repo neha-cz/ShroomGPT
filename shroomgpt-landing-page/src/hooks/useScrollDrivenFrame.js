@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
+import { publicUrl } from "../lib/publicUrl.js";
 
 const FRAME_COUNT = 240;
 const FRAME_SCROLL_SPEED = 2.2;
 const FRAME_PATH = (index) => {
   const n = String(index + 1).padStart(3, "0");
-  return `/ezgif-6aea8380a2524c7e-jpg/ezgif-frame-${n}.jpg`;
+  return publicUrl(`ezgif-6aea8380a2524c7e-jpg/ezgif-frame-${n}.jpg`);
 };
 
 /**
