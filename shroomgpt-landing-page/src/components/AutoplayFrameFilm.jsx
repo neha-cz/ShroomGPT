@@ -1,16 +1,12 @@
 import { useEffect, useRef } from "react";
-import { publicUrl } from "../lib/publicUrl.js";
+import { shroomgptEzgifFramePath } from "../lib/ezgifPaths.js";
+import { safeDecodeImage } from "../lib/safeImageDecode.js";
 import styles from "./AutoplayFrameFilm.module.css";
 
 const FRAME_COUNT = 240;
 const FPS = 24;
-/** Brain strip — 1280×720 (16:9) in `public/`. */
-const FILM_DIR = "ezgif-29069d220b1923cd-jpg";
 
-function frameUrl(index) {
-  const n = String(index + 1).padStart(3, "0");
-  return publicUrl(`${FILM_DIR}/ezgif-frame-${n}.jpg`);
-}
+const frameUrl = (index) => shroomgptEzgifFramePath(index);
 
 /**
  * Time-driven JPEG sequence (not scroll-linked). Double-buffered img swap
@@ -70,11 +66,7 @@ export function AutoplayFrameFilm({ className = "" }) {
         const next = frameUrl(want);
         hid.src = next;
         hid.dataset.frameSrc = next;
-        try {
-          if (hid.decode) await hid.decode();
-        } catch {
-          /* ignore */
-        }
+        await safeDecodeImage(hid);
         if (!alive) return;
         const latest = frameAtTime(performance.now());
         if (latest !== want) continue;
@@ -118,14 +110,18 @@ export function AutoplayFrameFilm({ className = "" }) {
           ref={img0Ref}
           className={`${styles.layer} ${styles.layerOn}`}
           alt=""
-          decoding="async"
+          loading="eager"
+          fetchPriority="high"
+          decoding="auto"
           draggable={false}
         />
         <img
           ref={img1Ref}
           className={`${styles.layer} ${styles.layerOff}`}
           alt=""
-          decoding="async"
+          loading="eager"
+          fetchPriority="low"
+          decoding="auto"
           draggable={false}
         />
       </div>

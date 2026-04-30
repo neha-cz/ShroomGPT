@@ -33,7 +33,8 @@ export function FrameCanvas({ getRunwayEndPx }) {
         ref={img0Ref}
         className={`${styles.layer} ${styles.layerOn}`}
         alt=""
-        decoding="async"
+        loading="eager"
+        decoding="auto"
         fetchPriority="high"
         draggable={false}
       />
@@ -41,7 +42,8 @@ export function FrameCanvas({ getRunwayEndPx }) {
         ref={img1Ref}
         className={`${styles.layer} ${styles.layerOff}`}
         alt=""
-        decoding="async"
+        loading="eager"
+        decoding="auto"
         fetchPriority="low"
         draggable={false}
       />

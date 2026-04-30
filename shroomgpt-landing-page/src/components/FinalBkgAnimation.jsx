@@ -1,17 +1,15 @@
 import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion.js";
+import { finalBkgEzgifFramePath } from "../lib/ezgifPaths.js";
 import { publicUrl } from "../lib/publicUrl.js";
+import { safeDecodeImage } from "../lib/safeImageDecode.js";
 import styles from "./FinalBkgAnimation.module.css";
 
 const FRAME_COUNT = 240;
 const FPS = 24;
-const DIR = "final-bkg-animation-folder";
 
-function frameUrl(index) {
-  const n = String(index + 1).padStart(3, "0");
-  return publicUrl(`${DIR}/ezgif-frame-${n}.jpg`);
-}
+const frameUrl = (index) => finalBkgEzgifFramePath(index);
 
 export function FinalBkgAnimation() {
   const sectionRef = useRef(null);
@@ -93,11 +91,7 @@ export function FinalBkgAnimation() {
         const next = frameUrl(want);
         hid.src = next;
         hid.dataset.frameSrc = next;
-        try {
-          if (hid.decode) await hid.decode();
-        } catch {
-          // ignore decode failures
-        }
+        await safeDecodeImage(hid);
         if (!alive) return;
         if (frameAtTime(performance.now()) !== want) continue;
 
@@ -167,14 +161,18 @@ export function FinalBkgAnimation() {
         ref={img0Ref}
         className={`${styles.layer} ${styles.layerOn}`}
         alt=""
-        decoding="async"
+        loading="eager"
+        decoding="auto"
+        fetchPriority="high"
         draggable={false}
         />
         <img
         ref={img1Ref}
         className={`${styles.layer} ${styles.layerOff}`}
         alt=""
-        decoding="async"
+        loading="eager"
+        decoding="auto"
+        fetchPriority="low"
         draggable={false}
         />
       </motion.div>

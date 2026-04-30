@@ -16,9 +16,15 @@ import styles from "./App.module.css";
  */
 function runwayScrollEndPx(spacerEl) {
   if (!spacerEl) return 0;
-  const h = spacerEl.offsetHeight;
+  const h =
+    spacerEl.getBoundingClientRect().height || spacerEl.offsetHeight || 0;
   const vh = window.innerHeight;
-  return Math.max(0, h - vh);
+  const end = Math.max(0, h - vh);
+  if (end > 0) return end;
+  // Spacer 0px or h ≤ vh (only flex/CSS timing): a 0px runway makes frameIndexFromScrollY
+  // use scrollRange 0 and the film never advances. Fall back to one viewport of scroll.
+  if (h > 0) return Math.max(1, h);
+  return Math.max(1, vh);
 }
 
 export default function App() {

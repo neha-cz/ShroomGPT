@@ -1,12 +1,10 @@
 import { useEffect, useRef } from "react";
-import { publicUrl } from "../lib/publicUrl.js";
+import { heroEzgifFramePath } from "../lib/ezgifPaths.js";
+import { safeDecodeImage } from "../lib/safeImageDecode.js";
 
 const FRAME_COUNT = 240;
 const FRAME_SCROLL_SPEED = 2.2;
-const FRAME_PATH = (index) => {
-  const n = String(index + 1).padStart(3, "0");
-  return publicUrl(`ezgif-6aea8380a2524c7e-jpg/ezgif-frame-${n}.jpg`);
-};
+const FRAME_PATH = (index) => heroEzgifFramePath(index);
 
 /**
  * @deprecated For page-wide scroll; prefer a fixed runway (hero spacer) via
@@ -29,10 +27,15 @@ export function frameIndexFromScroll(totalFrames) {
  * (scroll up reverses; `y` past the range keeps t=1 = “end” frame).
  */
 export function frameIndexFromScrollY(y, scrollRangePx, totalFrames, speed = 1) {
-  const tBase =
-    scrollRangePx <= 0
-      ? 0
-      : Math.min(1, Math.max(0, y / scrollRangePx));
+  let range = scrollRangePx;
+  if (range <= 0 && typeof document !== "undefined" && typeof window !== "undefined") {
+    // Avoid a stuck single frame when the runway is mis-measured (0) in prod layout.
+    const vh = window.innerHeight;
+    const docH = document.documentElement?.scrollHeight ?? 0;
+    const fallback = Math.max(0, docH - vh);
+    range = fallback > 0 ? fallback : Math.max(1, vh);
+  }
+  const tBase = Math.min(1, Math.max(0, y / range));
   const t = Math.min(1, tBase * Math.max(0.1, speed));
   const forward = Math.round(t * (totalFrames - 1));
   /* Top of page = last frame; scrolling down runs the sequence backward */
@@ -131,11 +134,7 @@ export function useScrollDrivenDoubleBuffer(
         hid.src = next;
         hid.dataset.frameSrc = next;
 
-        try {
-          if (hid.decode) await hid.decode();
-        } catch {
-          /* ignore decode errors */
-        }
+        await safeDecodeImage(hid);
         if (!alive) return;
 
         const latest = currentFrame();
@@ -174,8 +173,16 @@ export function useScrollDrivenDoubleBuffer(
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
 
+    const onLoad = () => schedule();
+    if (document.readyState === "complete") {
+      requestAnimationFrame(() => schedule());
+    } else {
+      window.addEventListener("load", onLoad, { passive: true });
+    }
+
     return () => {
       alive = false;
+      window.removeEventListener("load", onLoad);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (rafRef.current) {
