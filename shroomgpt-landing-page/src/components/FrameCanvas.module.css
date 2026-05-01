@@ -15,19 +15,23 @@
   object-fit: cover;
   /* translateZ promotes a compositor layer for steadier opacity swaps */
   transform: translateZ(0) scale(1.02);
-  filter: brightness(1.07) saturate(1.08) contrast(1.05);
   /* Instant swap — opacity transitions cause ghosting on fast scroll */
   transition: none;
   will-change: opacity;
 }
 
+/* Filter only the visible buffer — full-screen filter on both layers doubles GPU cost */
 .layerOn {
   opacity: 1;
   z-index: 2;
+  visibility: visible;
+  filter: brightness(1.07) saturate(1.08) contrast(1.05);
 }
 
 .layerOff {
   opacity: 0;
   z-index: 1;
+  visibility: hidden;
   pointer-events: none;
+  filter: none;
 }

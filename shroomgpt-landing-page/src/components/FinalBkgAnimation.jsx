@@ -83,13 +83,13 @@ export function FinalBkgAnimation() {
     };
 
     resetPlayback();
-    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 56);
+    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 72);
     let cancelIdlePrefetch = () => {};
     const idleDelayHandle = window.setTimeout(() => {
       cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
         frameUrl,
         FRAME_COUNT,
-        { batchSize: 14 }
+        { batchSize: 22 }
       );
     }, 2400);
 
@@ -102,6 +102,7 @@ export function FinalBkgAnimation() {
 
         const hid = hiddenEl();
         const next = frameUrl(want);
+        hid.fetchPriority = "high";
         hid.src = next;
         hid.dataset.frameSrc = next;
         const ok = await safeDecodeImage(hid, next);
@@ -112,7 +113,7 @@ export function FinalBkgAnimation() {
         applyLayerClasses(frontIs0);
         displayed = want;
         playbackProgress.set(want / (FRAME_COUNT - 1));
-        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 52);
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 64);
       }
     };
 

@@ -58,11 +58,11 @@ export function AutoplayFrameFilm({ className = "" }) {
     el1.dataset.frameSrc = "";
     applyLayerClasses(true);
     displayed = 0;
-    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 56);
+    prefetchFrameRing(frameUrl, 0, FRAME_COUNT, 72);
     const cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
       frameUrl,
       FRAME_COUNT,
-      { batchSize: 14 }
+      { batchSize: 22 }
     );
 
     let pumping = false;
@@ -74,6 +74,7 @@ export function AutoplayFrameFilm({ className = "" }) {
 
         const hid = hiddenEl();
         const next = frameUrl(want);
+        hid.fetchPriority = "high";
         hid.src = next;
         hid.dataset.frameSrc = next;
         const ok = await safeDecodeImage(hid, next);
@@ -83,7 +84,7 @@ export function AutoplayFrameFilm({ className = "" }) {
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
-        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 52);
+        prefetchFrameRing(frameUrl, displayed, FRAME_COUNT, 64);
       }
     };
 

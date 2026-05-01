@@ -19,17 +19,58 @@ function resolvedSrcMatches(img, expectedHref) {
   }
 }
 
+/** href → promise that settles after network load + decode() on a prefetch Image */
+const stripWarmByHref = new Map();
+
+function trimStripWarmMap() {
+  while (stripWarmByHref.size > 520) {
+    const k = stripWarmByHref.keys().next().value;
+    stripWarmByHref.delete(k);
+  }
+}
+
+function prefetchOneUrl(u) {
+  const href = resolveHref(u);
+  if (stripWarmByHref.has(href)) return;
+
+  const img = new Image();
+  img.decoding = "async";
+  img.fetchPriority = "low";
+
+  const warm = new Promise((resolve) => {
+    const finish = () => {
+      if (img.naturalWidth <= 0) {
+        resolve();
+        return;
+      }
+      if (typeof img.decode === "function") {
+        void img.decode().then(() => resolve()).catch(() => resolve());
+      } else {
+        resolve();
+      }
+    };
+    img.addEventListener("load", finish, { once: true });
+    img.addEventListener("error", () => resolve(), { once: true });
+  });
+
+  stripWarmByHref.set(href, warm);
+  trimStripWarmMap();
+  img.src = u;
+}
+
 /**
  * Wait until `img` has loaded the URL we care about, then try `decode()` so the
  * swap is not a half-painted frame. Returns false on error, aborted load, or
  * if `src` changed before completion.
- *
- * The old 200ms race caused production (slower CPU/network) to swap before
- * decode finished — glitchy “intermediate” frames.
  */
 export async function safeDecodeImage(img, expectedSrc = null) {
   if (!img) return false;
   const expectedHref = expectedSrc != null ? resolveHref(expectedSrc) : null;
+
+  if (expectedHref) {
+    const warm = stripWarmByHref.get(expectedHref);
+    if (warm) await warm.catch(() => {});
+  }
 
   const stillExpected = () =>
     expectedHref == null || resolvedSrcMatches(img, expectedHref);
@@ -82,22 +123,10 @@ export async function safeDecodeImage(img, expectedSrc = null) {
   return stillExpected() && img.naturalWidth > 0;
 }
 
-const prefetchedFrameUrls = new Set();
-
-function prefetchOneUrl(u) {
-  if (prefetchedFrameUrls.has(u)) return;
-  prefetchedFrameUrls.add(u);
-  const pre = new Image();
-  pre.decoding = "async";
-  pre.fetchPriority = "low";
-  pre.src = u;
-}
-
 const modIndex = (i, n) => ((i % n) + n) % n;
 
 /**
- * Warm cache around `centerIndex` (for scroll scrub: both directions; for
- * playback: set `behind` to 0 or a small wrap window).
+ * Warm cache around `centerIndex` (scroll scrub: both directions).
  */
 export function prefetchFrameNeighborhood(
   frameUrl,
@@ -128,8 +157,7 @@ export function prefetchFrameRing(
 }
 
 /**
- * Fill the HTTP cache for an entire strip during idle time (low priority),
- * so playback and scrub stay ahead of decode. Respects Save-Data / 2g.
+ * Idle-time full-strip prefetch + decode warm. Respects Save-Data / 2g.
  * @returns {() => void} cancel
  */
 export function scheduleIdleFilmstripPrefetch(
@@ -137,7 +165,7 @@ export function scheduleIdleFilmstripPrefetch(
   frameCount,
   options = {}
 ) {
-  const batchSize = options.batchSize ?? 16;
+  const batchSize = options.batchSize ?? 22;
   const skipIfSaveData = options.skipIfSaveData !== false;
 
   if (typeof window === "undefined") return () => {};
@@ -162,14 +190,14 @@ export function scheduleIdleFilmstripPrefetch(
     }
     if (cursor >= frameCount) return;
     if (typeof requestIdleCallback !== "undefined") {
-      handle = requestIdleCallback(step, { timeout: 2800 });
+      handle = requestIdleCallback(step, { timeout: 2200 });
     } else {
-      handle = window.setTimeout(step, 40);
+      handle = window.setTimeout(step, 32);
     }
   };
 
   if (typeof requestIdleCallback !== "undefined") {
-    handle = requestIdleCallback(step, { timeout: 2800 });
+    handle = requestIdleCallback(step, { timeout: 2200 });
   } else {
     handle = window.setTimeout(step, 0);
   }

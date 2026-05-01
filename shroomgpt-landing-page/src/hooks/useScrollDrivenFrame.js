@@ -117,15 +117,16 @@ export function useScrollDrivenDoubleBuffer(
     visibleEl().dataset.frameSrc = boot;
     applyLayerClasses(true);
     displayed = initial;
-    prefetchFrameNeighborhood(FRAME_PATH, initial, totalFrames, 56, 56);
+    prefetchFrameNeighborhood(FRAME_PATH, initial, totalFrames, 72, 72);
     const cancelIdlePrefetch = scheduleIdleFilmstripPrefetch(
       FRAME_PATH,
       totalFrames,
-      { batchSize: 14 }
+      { batchSize: 22 }
     );
 
     const pump = async () => {
       let safety = 0;
+      let heavyDecodes = 0;
       while (currentFrame() !== displayed) {
         if (!alive) return;
         if (++safety > 400) break;
@@ -142,10 +143,11 @@ export function useScrollDrivenDoubleBuffer(
           frontIs0 = !frontIs0;
           applyLayerClasses(frontIs0);
           displayed = want;
-          prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 48, 48);
+          prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 56, 56);
           continue;
         }
 
+        hid.fetchPriority = "high";
         hid.src = next;
         hid.dataset.frameSrc = next;
 
@@ -158,10 +160,15 @@ export function useScrollDrivenDoubleBuffer(
           continue;
         }
 
+        heavyDecodes += 1;
+        if (heavyDecodes % 3 === 0) {
+          await new Promise((r) => requestAnimationFrame(r));
+        }
+
         frontIs0 = !frontIs0;
         applyLayerClasses(frontIs0);
         displayed = want;
-        prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 48, 48);
+        prefetchFrameNeighborhood(FRAME_PATH, want, totalFrames, 56, 56);
       }
     };
 
